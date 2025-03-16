@@ -1,0 +1,98 @@
+
+.header {
+    position: fixed; /* Cố định header trên đầu */
+    width: 432px;
+    height: 90px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(25, 140, 65, 1);
+    padding: 10px 20px;
+    color: white;
+    z-index: 9999;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center; 
+    gap: 10px; /* Khoảng cách giữa logo và chữ */
+}
+
+.logo img {
+    width: 60px; 
+    height: auto;
+    object-fit: contain; /* Đảm bảo ảnh không bị méo */
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.text-2 {
+    font-size: 14px;
+    color: white;
+}
+
+.logo-list,
+.logo-find {
+    font-size: 30px;
+    cursor: pointer;
+   
+}
+
+.logo-list:active,
+.logo-find:active {
+    color: rgba(133, 210, 163, 1);
+    
+}
+
+/* Menu bên trái */
+.menu {
+    margin-top: 90px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    /* Menu bắt đầu ẩn bên trái màn hình */
+    width: 150px;
+    height: 20vh;
+    color: black;
+    background-color: white;
+    z-index: 9999;
+    transition: left 0.3s ease;
+    /* Tạo hiệu ứng trượt */
+}
+
+/* Khi menu mở, dịch sang vị trí 0 */
+.menu.open {
+    left: 0;
+}
+
+/* Menu các item */
+.menu ul {
+    list-style: none;
+    padding: 0;
+
+}
+
+.menu li {
+    background: white;
+    padding: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #ddd;
+    /* Đường kẻ ngăn cách */
+    cursor: pointer;
+
+}
+
+/* Hiệu ứng hover cho các item trong menu */
+.menu li:active {
+    background: #e0e0e0;
+}

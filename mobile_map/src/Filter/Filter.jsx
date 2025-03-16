@@ -1,0 +1,261 @@
+import React, { useState, useEffect } from "react";
+import classNames from "classnames/bind";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import styles from './Filter.module.scss';
+import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import hàm fetchTienIch
+
+const cx = classNames.bind(styles);
+
+const Filter = ({ onFilter }) => {
+  const [showMore, setShowMore] = useState(false);
+  const [selectedArea, setSelectedArea] = useState("");
+  const navigate = useNavigate();
+  const [tienNghiList, setTienNghiList] = useState([]); //lưu tiennghi
+  const [thongtinthemList, setThongTinThemList] = useState([]); //lưu tiennghi
+  const [formData, setFormData] = useState({
+    giaMin: "",
+    giaMax: "",
+    kichThuocMin: "",
+    kichThuocMax: "",
+    chungChu: false,
+    thuCung: false,
+    TienNghi: [],
+    thongTinThem: [],
+    radius: ""
+  });
+
+  const handleShowMore = () => {
+    setShowMore(!showMore);
+  };
+
+  // Nhập input
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Box change
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      TienNghi: checked
+        ? [...prev.TienNghi, value] // Nếu được chọn → thêm vào mảng
+        : prev.TienNghi.filter((item) => item !== value), // Nếu bỏ chọn → loại bỏ khỏi mảng
+    }));
+  };
+
+  // Box change1
+  const handleCheckboxChange1 = (e) => {
+    const { value, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      thongTinThem: checked
+        ? [...prev.thongTinThem, value] // Nếu được chọn → thêm vào mảng
+        : prev.thongTinThem.filter((item) => item !== value), // Nếu bỏ chọn → loại bỏ khỏi mảng
+    }));
+  };
+
+
+  useEffect(() => {
+    const fetchtiennghi1 = async () => {
+      try {
+        const response = await fetchTienNghi();
+        const response1 = await fetchThongTinThem();
+        console.log("Dữ liệu thêm:", response1);
+        console.log("Dữ liệu tiện nghi:", response);
+        setTienNghiList(response);
+        setThongTinThemList(response1);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách nội thất:", error);
+      }
+    };
+
+    fetchtiennghi1();
+  }, []);
+
+  // Checkbox boolean
+  const handleCheckboxChangeBoolean = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked, // Chuyển đổi giá trị boolean
+    }));
+  };
+
+  // Hành động khi chọn trường radio
+  const handleRadiusChange = (e) => {
+    const value = e.target.value;
+    setSelectedArea(value); // Cập nhật state để hiển thị lựa chọn
+    // Trích xuất số km từ chuỗi và chuyển sang mét
+    const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
+    console.log(radius)
+    // Cập nhật formData với giá trị radius (đơn vị: mét)
+    setFormData((prev) => ({
+      ...prev,
+      radius: radius,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+
+    try {
+      // Gửi thông tin trọ
+      console.log(formData);
+
+      const infoResponse = await axios.post("http://localhost:8000/api/find-nha-tro", formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("Phản hồi từ API:", infoResponse.data);
+      onFilter(infoResponse.data); // Gọi hàm onFilter với dữ liệu đã lọc
+    } catch (error) {
+      if (error.response) {
+        console.error("Lỗi từ server:", error.response.status, error.response.data);
+      } else if (error.request) {
+        console.error("Không nhận được phản hồi từ server:", error.request);
+      } else {
+        console.error("Lỗi khi thiết lập request:", error.message);
+      }
+    }
+  };
+
+
+
+  return (
+    <div className={cx("wrapper")}>
+      <header className={cx("header")}>
+        <p className={cx("heading_title")}>Tìm Kiếm</p>
+
+      </header>
+      <div className={cx("content")}>
+        <div className={cx("list")}>
+          <h3 className={cx("list_title")}>Khoảng cách từ trọ tới trường</h3>
+          <FontAwesomeIcon className={cx("down")} icon={faChevronDown} />
+          <div className={cx("list_inner")}>
+            {[
+              "Dưới 1km",
+              "Dưới 2km",
+              "Dưới 3km",
+            ].map((item) => (
+              <div key={item} className={cx("inner_spacer")}>
+                <input
+                  type="radio"
+                  className={cx("inner_radio")}
+                  name="banKinh"
+                  value={item}
+                  checked={selectedArea === item}
+                  onChange={handleRadiusChange}
+                />
+                <p className={cx("inner_title")}>{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={cx("dien-tich-container")}>
+          <h2>Mức giá (triệu/tháng)</h2>
+          <div className={cx("dien-tich-container1")}>
+            <div className={cx("dien-tich-item")}>
+              <span className={cx("dien-tich-label")}></span>
+              <input type="number"
+                name="tienThueMin"
+                className={cx("dien-tich-input")}
+                placeholder="Giá tối thiểu"
+                value={formData.tienThueMin}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className={cx("dien-tich-item")}>
+              <span className={cx("dien-tich-label")}></span>
+              <input type="number"
+                name="tienThueMax"
+                className={cx("dien-tich-input")}
+                placeholder="Giá tối đa"
+                value={formData.tienThueMax}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={cx("dien-tich-container")}>
+          <h2>Diện tích (m2)</h2>
+          <div className={cx("dien-tich-container1")}>
+            <div className={cx("dien-tich-item")}>
+              <span className={cx("dien-tich-label")}></span>
+              <input type="number"
+                name="kichThuocMin"
+                className={cx("dien-tich-input")}
+                placeholder="Diện tích tối thiểu"
+                value={formData.kichThuocMin}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className={cx("dien-tich-item")}>
+              <span className={cx("dien-tich-label")}></span>
+              <input type="number"
+                name="kichThuocMax"
+                className={cx("dien-tich-input")}
+                placeholder="Diện tích tối đa"
+                value={formData.kichThuocMax}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        </div>
+
+
+
+        <div className={cx("option")}>
+          <div className={cx("form_group")}>
+            <h3 className={cx("form_title")}>Tiện nghi phòng</h3>
+            <div className={cx("option_item")}>
+              {tienNghiList.map((item) => (
+                <div key={item.id} className={cx("item")}>
+                  <input
+                    type="checkbox"
+                    className={cx("option_checkbox")}
+                    value={item.id}
+                    onChange={handleCheckboxChange}
+                  />
+                  <p className={cx("option_title")}>{item.tenTienNghi}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+
+          <div className={cx("form_group")}>
+            <h3 className={cx("form_title")}>Thông tin thêm</h3>
+            <div className={cx("option_item")}>
+              {thongtinthemList.map((item) => (
+                <div key={item.id} className={cx("item")}>
+                  <input
+                    type="checkbox"
+                    className={cx("option_checkbox")}
+                    value={item.id}
+                    onChange={handleCheckboxChange1}
+                  />
+                  <p className={cx("option_title")}>{item.thongTinThem}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={cx("seperate")}></div>
+          <button className={cx("search")} onClick={handleSubmit}>Search</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Filter;

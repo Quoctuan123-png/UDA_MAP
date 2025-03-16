@@ -1,0 +1,57 @@
+/* HousePopupDetail.css */
+
+.popup-container {
+    width: 340px;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 10px;
+    height: auto;
+    overflow: visible;
+    position: relative;
+    /* ← thêm dòng này để left hoạt động */
+    left: -14px;
+    top: -5px;
+}
+
+.popup-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tab-btn {
+    padding: 6px 10px;
+    border: none;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.tab-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.popup-form input,
+.popup-form textarea {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+}
+
+.popup-form button {
+    width: 100%;
+    padding: 8px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
