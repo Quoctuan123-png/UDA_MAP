@@ -1,4 +1,249 @@
+.wrapper {
+    max-height: 670px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.content {
+    padding: 0 25px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    height: 60px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.heading_title {
+    font-size: 1.7rem;
+    font-weight: 500;
+}
+
+.clear {
+    font-size: 2rem;
+    background-color: transparent;
+}
+
+.form_group {
+    margin: 25px 0;
+}
+
+.form_group p {
+    margin-bottom: auto;
+}
+
+.content_title {
+    text-align: center;
+    padding-top: 30px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.form_input {
+    width: 100%;
+    padding: 13px 12px;
+    font-size: 1.7rem;
+    border: 1px solid #ccc;
+    margin-top: 12px;
+    border-radius: 8px;
+}
+
+.option_item {
+    display: grid;
+    gap: 14px 1px;
+    grid-template-columns: repeat(2, 1fr);
+    place-items: flex-start;
+    margin-top: 15px;
+}
+
+.option_item p {
+    font-size: 1.8rem;
+}
+
+.item {
+    display: flex;
+    font-size: 1.8rem;
+    gap: 12px;
+}
+
+.item1 {
+    display: flex;
+    font-size: 1.8rem;
+    gap: 12px;
+    align-items: center;
+}
+
+.option_radio {
+    width: 18px;
+}
+
+.item_more {
+    text-align: right;
+    margin-right: 55px;
+    margin-top: 13px;
+    font-size: 1.7rem;
+    color: #beb3b3;
+}
+
+.list {
+    position: relative;
+    height: 57px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    width: 100%;
+    justify-content: space-between;
+    position: relative;
+    border-radius: 8px;
+    background-color: transparent;
+    margin: 22px auto;
+    border: 1px solid #ccc;
+}
+
+.list_inner {
+    position: absolute;
+    width: 100%;
+    display: none;
+    border-radius: 6px;
+    top: 113%;
+    left: 0;
+    background-color: #ccc;
+    z-index: 999;
+}
+
+.inner_spacer {
+    display: flex;
+    padding: 7px 11px;
+}
+
+.inner_title {
+    font-size: 1.9rem;
+    margin-left: 12px;
+}
+
+.inner_radio {
+    width: 19px;
+}
+
+.list:hover .list_inner {
+    display: block;
+}
+
+// .btn {
+//     background: transparent;
+//     padding: 9px 0;
+//     border-radius: 9px;
+//     border: 1px solid #089347;
+//     color: #089347;
+//     font-weight: 600;
+//     width: 100%;
+//     margin-bottom: 15px;
+//     font-size: 2.3rem;
+// }
+
+.btn {
+    padding: 12px 0;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    margin: 10px 0;
+    width: 100%;
+    background-size: 200% auto;
+    color: white;
+    font-size: 1.7rem;
+    border-radius: 10px;
+    display: block;
+    border: 0px;
+    font-weight: 700;
+    box-shadow: 0px 0px 14px -7px #f09819;
+    background-image: linear-gradient(45deg,
+            #ff512f 0%,
+            #f09819 51%,
+            #ff512f 100%);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.btn:hover {
+    background-position: right center;
+    /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.image_preview {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+.dien-tich-container {
+    font-family: Arial, sans-serif;
+    max-width: 400px;
+    // margin: 20px;
+    // padding: 20px;
+    // border: 1px solid;
+    border-radius: 8px;
+    // background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+}
+
+.dien-tich-container1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.dien-tich-item {
+    margin-bottom: 10px;
+    width: 48%;
+    height: 50px;
+    display: flex;
+}
+
+.dien-tich-label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.dien-tich-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.dien-tich-input:focus {
+    border-color: black;
+    outline: none;
+}
+
+.form_title {
+    font-size: 1.6rem;
+}
+
 @media screen and (max-width: 480px) {
+    .wrapper {
+        max-height: 100%;
+    }
+
     .content {
         padding: 0 40px;
     }
@@ -11,6 +256,7 @@
         height: 60px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     }
+
     .heading_title {
         font-size: 2rem;
         font-weight: 500;
@@ -54,13 +300,15 @@
     }
 
     .option_item p {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
+
     .item {
         display: flex;
         font-size: 1.8rem;
         gap: 12px;
     }
+
     .item1 {
         display: flex;
         font-size: 1.8rem;
@@ -141,7 +389,6 @@
         border-radius: 10px;
     }
 
-
     .dien-tich-container {
         font-family: Arial, sans-serif;
         max-width: 400px;
@@ -153,35 +400,35 @@
         display: flex;
         flex-direction: column;
         margin-bottom: 30px;
-      }
-      .dien-tich-container1 {
+    }
+
+    .dien-tich-container1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        
-      }
-      
-      .dien-tich-container h2 {
+    }
+
+    .dien-tich-container h2 {
         font-size: 18px;
         margin-bottom: 15px;
         color: #333;
-      }
-      
-      .dien-tich-item {
+    }
+
+    .dien-tich-item {
         margin-bottom: 10px;
         width: 48%;
         height: 50px;
         display: flex;
-      } 
-      
-      .dien-tich-label {
+    }
+
+    .dien-tich-label {
         display: block;
         font-size: 14px;
         color: #555;
         margin-bottom: 5px;
-      }
-      
-      .dien-tich-input {
+    }
+
+    .dien-tich-input {
         width: 100%;
         padding: 8px;
         font-size: 15px;
@@ -189,11 +436,10 @@
         border-radius: 4px;
         box-sizing: border-box;
         font-family: Arial, sans-serif;
-      }
-      
-      .dien-tich-input:focus {
+    }
+
+    .dien-tich-input:focus {
         border-color: black;
         outline: none;
-       
-      }
+    }
 }

@@ -1,0 +1,27 @@
+.home_wrapper {
+    display: flex;
+}
+
+.icon_right {
+    position: absolute;
+    width: 86px;
+    height: 88px;
+    top: 46%;
+    background: transparent;
+    z-index: 9999;
+    left: -8.7%;
+    color: #fff;
+    box-shadow: rgba(0, 255, 187, 0.2) 0px 2px 8px 0px;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        /* Giảm kích thước font cho mobile */
+    }
+
+    .icon_right {
+        display: block;
+    }
+}

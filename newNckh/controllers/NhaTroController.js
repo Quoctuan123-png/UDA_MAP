@@ -122,17 +122,19 @@ const findNhaTro = async (req, res) => {
 
         // ✅ 3. Lọc theo tiện nghi (nếu có)
         let includeTienNghi = [];
-        if (req.body.tienNghi && req.body.tienNghi.length > 0) {
+        if (req.body.TienNghi && req.body.TienNghi.length > 0) {
             includeTienNghi = [
                 {
                     model: TienNghi,
                     through: { attributes: [] }, // Ẩn bảng trung gian
-                    where: { id: { [Op.in]: req.body.tienNghi } },
+                    where: { id: { [Op.in]: req.body.TienNghi } },
                     required: true // Bắt buộc phải có tiện nghi
                 }
             ];
         }
+        // console.log(req.body.TienNghi)
 
+        // console.log(includeTienNghi)
         // ✅ 4. Tìm kiếm nhà trọ từ DB
         let nhaTroList = await NhaTro.findAll({
             where: whereCondition,
@@ -204,11 +206,11 @@ const upfiles = async (req, res) => {
         res.status(201).json({ message: "Upload thành công!", data: uploadedImages });
 
         // Xóa file sau khi upload thành công (nếu cần)
-        if (req.file) {
-            fs.unlinkSync(req.file.path);
-        } else {
-            req.files.forEach(file => fs.unlinkSync(file.path));
-        }
+        // if (req.file) {
+        //     fs.unlinkSync(req.file.path);
+        // } else {
+        //     req.files.forEach(file => fs.unlinkSync(file.path));
+        // }
 
     } catch (error) {
         console.error("Lỗi khi upload file:", error);

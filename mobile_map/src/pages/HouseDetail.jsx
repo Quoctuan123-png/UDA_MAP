@@ -50,18 +50,18 @@ const HouseDetail = () => {
     // };
 
     // Xử lý lấy dữ liệu hình ảnh
-    useEffect(() => {
-        const fetchHouseImg = async () => {
-            try {
-                const imgUrl = await fetchImage(id);
-                console.log("Ảnh tải về:", imgUrl); // Kiểm tra dữ liệu ảnh
-                setImg(imgUrl);
-            } catch (error) {
-                console.error("Lỗi khi lấy ảnh:", error);
-            }
-        };
-        fetchHouseImg();
-    }, [id]);
+    // useEffect(() => {
+    //     const fetchHouseImg = async () => {
+    //         try {
+    //             const imgUrl = await fetchImage(id);
+    //             console.log("Ảnh tải về:", imgUrl); // Kiểm tra dữ liệu ảnh
+    //             setImg(imgUrl);
+    //         } catch (error) {
+    //             console.error("Lỗi khi lấy ảnh:", error);
+    //         }
+    //     };
+    //     fetchHouseImg();
+    // }, [id]);
 
     // Xử lý lấy dữ liệu nhà trọ
     useEffect(() => {

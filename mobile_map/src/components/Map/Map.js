@@ -1,75 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import { fetchLocations } from "../../services/api"; // Import API
-import Filter from "../../Filter/Filter"; // Import Filter component
-import Header from "../Header/Header"; // Import Header component
-import HousePopupDetail from "../Popup/HousePopupDetail"; // điều chỉnh path tùy vào bạn đặt file
-import CustomPopup from "../Popup/CustomPopup"; // điều chỉnh path tùy vào bạn đặt file
+import { fetchLocations } from "../../services/api";
+import CustomPopup from "../Popup/CustomPopup";
 import "./Map.css";
 
 const universityLocation = [16.032, 108.2212];
 
-const Map = () => {
-    const [houses, setHouses] = useState([]);
+const Map = ({ filteredData1,onCoordinatesr  }) => {
     const [filteredHouses, setFilteredHouses] = useState([]);
-    const [showSearchForm, setShowSearchForm] = useState(false);
-    const navigate = useNavigate();
+
+    // 📌 Hàm chuẩn hóa dữ liệu vị trí
+    const formatHouses = (data) => {
+        return data
+            .map((house) => {
+                if (!house.lat || !house.lon) return null;
+                const latitude = parseFloat(house.lat);
+                const longitude = parseFloat(house.lon);
+                if (isNaN(latitude) || isNaN(longitude)) return null;
+                return { ...house, latitude, longitude };
+            })
+            .filter((house) => house !== null);
+    };
 
     useEffect(() => {
-        const fetchHouses = async () => {
+        const loadHouses = async () => {
             try {
-                const data = await fetchLocations();
-                const formattedHouses = data
-                    .map(house => {
-                        if (house.lat === undefined || house.lon === undefined) return null;
-                        const latitude = parseFloat(house.lat);
-                        const longitude = parseFloat(house.lon);
-                        if (isNaN(latitude) || isNaN(longitude)) return null;
-                        return { ...house, latitude, longitude };
-                    })
-                    .filter(house => house !== null);
-                setHouses(formattedHouses);
-                setFilteredHouses(formattedHouses);
+                if (filteredData1 && filteredData1.length > 0) {
+                    console.log("✅ filteredData1 từ Home:", filteredData1);
+                    const formatted = formatHouses(filteredData1);
+                    setFilteredHouses(formatted);
+                } else {
+                    console.log("📥 Lấy dữ liệu từ API vì filteredData1 rỗng...");
+                    const data = await fetchLocations();
+                    const formatted = formatHouses(data);
+                    setFilteredHouses(formatted);
+                }
             } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu nhà trọ:", error);
+                console.error("❌ Lỗi khi tải dữ liệu nhà trọ:", error);
             }
         };
 
-        fetchHouses();
-    }, []);
+        loadHouses();
+    }, [filteredData1]);
 
-    const handleFilter = (filteredData) => {
-        console.log(filteredData);
-        setFilteredHouses(filteredData);
-    };
-
-    const handleSearchClick = () => {
-        setShowSearchForm(!showSearchForm);
-    };
-
-    const universityIcon = new L.DivIcon({
-        html: '<i class="fas fa-school" style="font-size: 24px; color: rgba(25, 140, 65, 1);"></i>',
-        className: "custom-div-icon",
+    const universityIcon = new L.Icon({
+        iconUrl: "images/udalogo-removebg-preview.png",
+        className: "custom-div-iconuni",
         iconSize: [50, 50],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30],
     });
 
-    const houseIcon = new L.DivIcon({
-        html: '<i class="fas fa-home" style="font-size: 18px; color: red;"></i>',
+    const houseIcon = new L.Icon({
+        iconUrl: "images/logohouse-removebg-preview.png",
         className: "custom-div-icon",
-        iconSize: [30, 30],
+        iconSize: [35, 35],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30],
     });
 
     return (
-        <div style={{ position: "relative", height: "100vh" }}>
-            <Header onSearchClick={handleSearchClick} />
+        <div className="map">
             <MapContainer
                 center={universityLocation}
                 zoom={15}
@@ -79,26 +71,39 @@ const Map = () => {
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                 <Marker position={universityLocation} icon={universityIcon}>
-                    <Popup options={{ className: 'popup-school' }}>
-                        <div>
-                            <b>Trường Đại học Đông Á</b>
-                            <br />
-                            Địa chỉ: 33 Xô Viết Nghệ Tĩnh, Đà Nẵng
+                    <Popup>
+                        <div className="popup-container">
+                            <div className="popup-image">
+                                <img
+                                    src="https://cdn.nhanlucnganhluat.vn/uploads/images/360e09f7/source/2018-11/dai-hoc-a-15260318284302087536677.jpg"
+                                    alt="logo"
+                                    style={{ width: "100%", height: "40%" }}
+                                />
+                            </div>
+                            <div className="popup-university">
+                                <h2>Trường Đại học Đông Á</h2>
+                                <div className="popup-info">
+                                    <p><i className="fas fa-map-marker-alt"></i>Địa chỉ: 33 Xô Viết Nghệ Tĩnh, Hòa Cường Nam</p>
+                                    <p><i className="fas fa-globe"></i> <a href="https://donga.edu.vn/gioi-thieu">Link:    donga.edu.vn</a></p>
+                                    <p><i className="fas fa-phone"></i>SĐT:    02363519991</p>
+                                </div>
+                            </div>
                         </div>
                     </Popup>
                 </Marker>
 
-                {filteredHouses.map((house) => (
-                    <Marker position={[house.lat, house.lon]} icon={houseIcon}>
-                        <Popup options={{ className: 'popup-hostel' }}>
-                            <div>
-                                <CustomPopup house={house} />
-                            </div>
+                {filteredHouses.map((house, index) => (
+                    <Marker
+                        key={index}
+                        position={[house.latitude, house.longitude]}
+                        icon={houseIcon}
+                    >
+                        <Popup className="popup-hostel">
+                            <CustomPopup house={house} />
                         </Popup>
                     </Marker>
                 ))}
             </MapContainer>
-
         </div>
     );
 };

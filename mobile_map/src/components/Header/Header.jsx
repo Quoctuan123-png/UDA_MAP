@@ -1,56 +1,85 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faList } from '@fortawesome/free-solid-svg-icons';
-import '../Header/Header.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMagnifyingGlass,
+  faList,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
+import "../Header/Header.css";
+import Filter from "../../Filter/Filter";
+import Survey from "../../Survey/Survey";
 
-const Header = ({ onSearchClick }) => {
-  // State để kiểm tra khi nào menu sẽ hiển thị
+const Header = ({ isInnerVisible, onSearchClick, onReset, onFilter }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
-  const navigate = useNavigate();
+  const [activeContent, setActiveContent] = useState("Filter");
 
-  // Hàm xử lý khi nhấn vào icon faList
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // Đảo ngược trạng thái menu
+    setIsMenuOpen(!isMenuOpen);
   };
 
-  // Hàm xử lý khi nhấn vào icon tìm kiếm
-  const handleSearchClick = () => {
-    setShowSearchForm(!showSearchForm);
-    if (onSearchClick) {
-      onSearchClick();
+  const handleReset = () => {
+    if (onReset) {
+      onReset();
     }
   };
 
-  return (
-    <header className="header">
-      <div className="logo-list" onClick={toggleMenu}>
-        <FontAwesomeIcon icon={faList} />
-      </div>
-      <div className="logo">
-        <img src="images/UDA_logo.png" alt="Logo" />
-        <div className="text">
-          <h3 className="text-1">UDA MAP</h3>
-          <h4 className="tex-2">Bản đồ phòng trọ sinh viên UDA</h4>
-        </div>
-      </div>
-      <div className="logo-find" onClick={handleSearchClick}>
-        <FontAwesomeIcon icon={faMagnifyingGlass} />
-      </div>
+  const handleContentChange = (content) => {
+    setActiveContent(content);
+    setIsMenuOpen(false);
+  };
 
-      {/* Menu bên trái */}
-      <div className={`menu ${isMenuOpen ? 'open' : ''}`}>
-        <ul>
-          <li>
-            <Link to="/survey">Giới thiệu phòng trọ</Link>
-          </li>
-          <li>Diễn đàn</li>
-          <li>Liên hệ</li>
-        </ul>
+  const handleCloseSurvey = () => {
+    setActiveContent("Filter");
+  };
+
+
+
+  return (
+    <div className={`inner ${isInnerVisible ? "visible" : "hidden"}`}>
+      <header className="header">
+        <div className="logo-list" onClick={toggleMenu}>
+          <FontAwesomeIcon icon={faList} />
+        </div>
+        <div className="logo">
+          <img src="images/UDA_logo.png" alt="Logo" />
+          <div className="text">
+            <h3 className="text-1">UDA MAP</h3>
+            <h4 className="tex-2">Bản đồ phòng trọ sinh viên UDA</h4>
+          </div>
+        </div>
+        <div
+          onClick={() => handleContentChange("Filter")}
+          className="logo-find"
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlass} />
+        </div>
+
+        <div className="logo-left" onClick={handleReset}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </div>
+
+        <div className={`menu ${isMenuOpen ? "open" : ""}`}>
+          <ul>
+            <li onClick={() => handleContentChange("Survey")}>
+              <span>Giới thiệu phòng trọ</span>
+            </li>
+            <li>
+              <span>Diễn đàn</span>
+            </li>
+            <li>
+              <span>Liên hệ</span>
+            </li>
+          </ul>
+        </div>
+      </header>
+      <div className="content_list">
+        {activeContent === "Filter" && <Filter onFilter={onFilter} />}
+
+        {activeContent === "Survey" && (
+          <Survey onCloseSurvey={handleCloseSurvey} />
+        )}
       </div>
-    </header>
+    </div>
   );
 };
 

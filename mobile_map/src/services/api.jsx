@@ -1,12 +1,20 @@
-
 import axios from "axios";
+const API_URL = "http://localhost:8000";
+// const API_URL = "https://3b91-1-53-87-20.ngrok-free.app";
 
-const API_URL = "http://localhost:8000/api/nha-tro"; // Thay bằng API thực tế
+
 
 // Hàm lấy dữ liệu nhà trọ từ API
 export const fetchLocations = async () => {
     try {
-        const response = await axios.get(API_URL);
+        const response = await axios.get(`${API_URL}/api/nha-tro`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        })
+        console.log(response.data
+
+        )
         // console.log("tiennghi: ", response.data)
         return response.data;
     } catch (error) {
@@ -18,7 +26,11 @@ export const fetchLocations = async () => {
 // Hàm lấy chi tiết nhà trọ theo ID
 export const getHouseDetail = async (id) => {
     try {
-        const room = await axios.get(`http://localhost:8000/api/getroom/${id}`);
+        const room = await axios.get(`${API_URL}/api/getroom/${id}`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         console.log(room)
         return room;
 
@@ -31,44 +43,59 @@ export const getHouseDetail = async (id) => {
 //call api lấy hình ảnh
 export const fetchImage = async (Id) => {
     try {
-        const response = await fetch(`http://localhost:8000/api/getimg/${Id}`);
+        const response = await fetch(`${API_URL}/api/getimg/${Id}`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true",
+            },
+        });
+
         if (!response.ok) throw new Error("❌ Lỗi tải ảnh từ API");
 
         const data = await response.json();
         console.log("📌 Dữ liệu API trả về:", data);
 
-        // Kiểm tra dữ liệu ảnh hợp lệ
-        if (!Array.isArray(data) || data.length === 0 || !data[0].hinhAnh) {
-            console.error("⚠️ Không có dữ liệu ảnh hợp lệ:", data);
-            return null;
+        if (!Array.isArray(data) || data.length === 0) {
+            console.warn("⚠️ Không có dữ liệu ảnh hợp lệ");
+            return [];
         }
 
-        // 🟢 Lấy Buffer chứa đường dẫn ảnh
-        const bufferData = data[0].hinhAnh.data;
-        if (!bufferData || !Array.isArray(bufferData)) {
-            console.error("❌ Dữ liệu ảnh không đúng định dạng Buffer", bufferData);
-            return null;
-        }
+        // Fetch từng ảnh và tạo blob URLs
+        const imageBlobUrls = await Promise.all(
+            data.map(async (item) => {
+                let path = item.hinhAnh?.trim()?.replace(/\\/g, "/");
+                if (!path) return null;
 
-        // 🔥 Chuyển Buffer thành chuỗi đường dẫn
-        const imagePath = String.fromCharCode(...bufferData);
-        console.log("✅ Đường dẫn ảnh trên server:", imagePath);
+                const imgRes = await fetch(`${API_URL}/${path}`, {
+                    headers: {
+                        "ngrok-skip-browser-warning": "true",
+                    },
+                });
 
-        // 🖼️ Ghép domain để tạo URL ảnh hợp lệ
-        const fullImageUrl = `http://localhost:8000/${imagePath.replace(/\\/g, "/")}`;
-        console.log("🔗 URL ảnh hợp lệ:", fullImageUrl);
+                if (!imgRes.ok) {
+                    console.warn("⚠️ Không tải được ảnh:", path);
+                    return null;
+                }
 
-        return fullImageUrl; // Trả về URL ảnh đầy đủ
+                const blob = await imgRes.blob();
+                return URL.createObjectURL(blob);
+            })
+        );
+
+        return imageBlobUrls.filter((url) => url !== null);
     } catch (error) {
-        console.error("🔥 Lỗi khi tải ảnh:", error);
-        return null;
+        console.error("🔥 Lỗi khi fetchImage:", error);
+        return [];
     }
 };
 
 // Hàm tìm tọa độ từ địa chỉ
 export const fetchFind = async (Id) => {
     try {
-        const response = await fetch(`http://localhost:8000/api/find-nha-tro`);
+        const response = await fetch(`${API_URL}/api/find-nha-tro`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         const data = await response.json();
         console.log(data)
         return data;
@@ -83,8 +110,7 @@ export const fetchFind = async (Id) => {
 //     try {
 //         const response = await fetch(`http://localhost:8000/api/findtienich`);
 //         return response.data;
-//     } catch (error) {
-//         console.error("Lỗi khi lấy thông tin tiện ích:", error);
+//     } catch (error) {//         console.error("Lỗi khi lấy thông tin tiện ích:", error);
 //         throw error;
 //     }
 // };
@@ -92,7 +118,11 @@ export const fetchFind = async (Id) => {
 // Hàm tìm tiện nghi
 export const fetchTienNghi = async () => {
     try {
-        const response = await fetch(`http://localhost:8000/api/tien-nghi`);
+        const response = await fetch(`${API_URL}/api/tien-nghi`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         const data = await response.json();
 
         console.log(data)
@@ -106,13 +136,16 @@ export const fetchTienNghi = async () => {
 // Hàm gọi thông tin thêm
 export const fetchThongTinThem = async (Id) => {
     try {
-        const response = await fetch(`http://localhost:8000/api/thong-tin-them`);
+        const response = await fetch(`${API_URL}/api/thong-tin-them`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         const data = await response.json();
-        console.log("thông tin thêm:  ", data)
+        console.log("thông tin thêm:  ", data[0].thongTinThem)
         return data;
     } catch (error) {
         console.log(error)
     }
 
 }
-

@@ -17,12 +17,11 @@ body {
   background: #f4f4f4;
   position: relative;
   color: #2e2a2a;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-style: normal;
   font-weight: 300;
   font-size: 15px;
-  line-height: 1.5;
-  min-height: 100vh;
+  line-height: 2;
   /* Chiếm toàn bộ chiều cao màn hình */
 
   /* Sử dụng Flexbox để căn giữa #root */
@@ -37,10 +36,10 @@ body {
 #root {
   width: 100%;
   /* Đặt chiều rộng theo tỷ lệ phần trăm */
+  /* Giới hạn chiều rộng tối đa tương đương với kích thước của iPhone 14 Pro Max */
   height: 100%;
   /* Đặt chiều cao theo tỷ lệ phần trăm */
-  overflow: hidden;
+  /* Giới hạn chiều cao tối đa */
   position: relative;
   background-color: white;
 }
-

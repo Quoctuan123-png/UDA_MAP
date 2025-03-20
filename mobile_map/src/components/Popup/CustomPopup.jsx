@@ -4,14 +4,16 @@ import HousePopupDetail from "./HousePopupDetail"; // Component popup
 
 const CustomPopup = ({ house }) => {
   const popupRef = useRef(null);
+  const rootRef = useRef(null);
 
   useEffect(() => {
     if (popupRef.current) {
-      const root = ReactDOM.createRoot(popupRef.current);
-      root.render(<HousePopupDetail house={house} />);
+      if (!rootRef.current) {
+        rootRef.current = ReactDOM.createRoot(popupRef.current);
+      }
+      rootRef.current.render(<HousePopupDetail house={house} />);
     }
   }, [house]);
-
   return <div ref={popupRef} />;
 };
 

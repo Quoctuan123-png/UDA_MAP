@@ -1,98 +1,202 @@
+.inner {
+    width: 35%;
+    transition: transform 0.3s ease-in-out;
+}
 
 .header {
-    position: fixed; /* Cố định header trên đầu */
-    width: 432px;
-    height: 90px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: rgba(25, 140, 65, 1);
+    justify-content: space-between;
     padding: 10px 20px;
-    color: white;
-    z-index: 9999;
-}
-
-/* Logo */
-.logo {
-    display: flex;
-    align-items: center; 
-    gap: 10px; /* Khoảng cách giữa logo và chữ */
-}
-
-.logo img {
-    width: 60px; 
-    height: auto;
-    object-fit: contain; /* Đảm bảo ảnh không bị méo */
-}
-
-.text {
-    display: flex;
-    flex-direction: column;
-}
-
-.text-1 {
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-}
-
-.text-2 {
-    font-size: 14px;
-    color: white;
+    background-color: #089347;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo-list,
 .logo-find {
-    font-size: 30px;
     cursor: pointer;
-   
+    color: #fff;
+    font-size: 18px;
 }
 
-.logo-list:active,
-.logo-find:active {
-    color: rgba(133, 210, 163, 1);
-    
+.logo {
+    display: flex;
+    align-items: center;
+
 }
 
-/* Menu bên trái */
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.text {
+    display: flex;
+    color: #fff;
+    flex-direction: column;
+}
+
+.text-1 {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.tex-2 {
+    font-size: 1.3rem;
+    color: #fff;
+}
+
 .menu {
-    margin-top: 90px;
-    position: fixed;
-    top: 0;
-    left: -250px;
-    /* Menu bắt đầu ẩn bên trái màn hình */
-    width: 150px;
-    height: 20vh;
-    color: black;
-    background-color: white;
-    z-index: 9999;
-    transition: left 0.3s ease;
-    /* Tạo hiệu ứng trượt */
-}
-
-/* Khi menu mở, dịch sang vị trí 0 */
-.menu.open {
+    display: none;
+    position: absolute;
+    top: 78px;
     left: 0;
+    z-index: 9999999;
+    width: 25.8%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Menu các item */
+.logo-left {
+    display: none;
+}
+
+.menu.open {
+    display: block;
+}
+
 .menu ul {
     list-style: none;
     padding: 0;
-
+    margin: 0;
 }
 
 .menu li {
-    background: white;
-    padding: 15px;
-    font-size: 18px;
-    border-bottom: 1px solid #ddd;
-    /* Đường kẻ ngăn cách */
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
     cursor: pointer;
-
 }
 
-/* Hiệu ứng hover cho các item trong menu */
-.menu li:active {
-    background: #e0e0e0;
+.menu li:hover {
+    background-color: #f9f9f9;
+}
+
+.menu li a {
+    text-decoration: none;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .header {
+        padding: 20px;
+        background-color: #089347;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo img {
+        height: 38px;
+        margin-right: 10px;
+    }
+
+    .text {
+        display: flex;
+        flex-direction: column;
+        color: #fff;
+    }
+
+    .text-1 {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .tex-2 {
+        font-size: 1.3rem;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .logo-left {
+        display: block;
+    }
+
+    .logo-left,
+    .logo-list {
+        cursor: pointer;
+        color: #fff;
+        font-size: 2.2rem;
+    }
+
+    .logo-find {
+        display: none;
+    }
+
+    .inner {
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #fff;
+        /* Màu nền */
+        z-index: 999999;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        overflow-y: auto;
+    }
+
+    .inner.hidden {
+        transform: translateX(-100%);
+    }
+
+    .inner.visible {
+        transform: translateX(0);
+    }
+
+    .menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu.open {
+        display: block;
+        margin-top: 20px;
+    }
+
+    .menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu li {
+        padding: 10px 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .menu li:hover {
+        background-color: #f9f9f9;
+    }
+
+    .menu li a {
+        text-decoration: none;
+        color: #333;
+    }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import styles from './Filter.module.scss';
+import styles from "./Filter.module.scss";
 import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import hàm fetchTienIch
@@ -24,7 +24,7 @@ const Filter = ({ onFilter }) => {
     thuCung: false,
     TienNghi: [],
     thongTinThem: [],
-    radius: ""
+    radius: "",
   });
 
   const handleShowMore = () => {
@@ -60,7 +60,6 @@ const Filter = ({ onFilter }) => {
     }));
   };
 
-
   useEffect(() => {
     const fetchtiennghi1 = async () => {
       try {
@@ -93,7 +92,7 @@ const Filter = ({ onFilter }) => {
     setSelectedArea(value); // Cập nhật state để hiển thị lựa chọn
     // Trích xuất số km từ chuỗi và chuyển sang mét
     const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
-    console.log(radius)
+    console.log(radius);
     // Cập nhật formData với giá trị radius (đơn vị: mét)
     setFormData((prev) => ({
       ...prev,
@@ -104,19 +103,26 @@ const Filter = ({ onFilter }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     try {
       // Gửi thông tin trọ
       console.log(formData);
 
-      const infoResponse = await axios.post("http://localhost:8000/api/find-nha-tro", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const infoResponse = await axios.post(
+        "http://localhost:8000/api/find-nha-tro",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       console.log("Phản hồi từ API:", infoResponse.data);
       onFilter(infoResponse.data); // Gọi hàm onFilter với dữ liệu đã lọc
     } catch (error) {
       if (error.response) {
-        console.error("Lỗi từ server:", error.response.status, error.response.data);
+        console.error(
+          "Lỗi từ server:",
+          error.response.status,
+          error.response.data
+        );
       } else if (error.request) {
         console.error("Không nhận được phản hồi từ server:", error.request);
       } else {
@@ -125,24 +131,21 @@ const Filter = ({ onFilter }) => {
     }
   };
 
-
-
   return (
     <div className={cx("wrapper")}>
-      <header className={cx("header")}>
+      <div className={cx("header")}>
         <p className={cx("heading_title")}>Tìm Kiếm</p>
-
-      </header>
+      </div>
       <div className={cx("content")}>
         <div className={cx("list")}>
-          <h3 className={cx("list_title")}>Khoảng cách từ trọ tới trường</h3>
+          <h3 className={cx("list_title")}>
+            {selectedArea
+              ? `Khoảng cách: ${selectedArea}`
+              : "Khoảng cách từ trọ tới trường"}
+          </h3>
           <FontAwesomeIcon className={cx("down")} icon={faChevronDown} />
           <div className={cx("list_inner")}>
-            {[
-              "Dưới 1km",
-              "Dưới 2km",
-              "Dưới 3km",
-            ].map((item) => (
+            {["Dưới 1km", "Dưới 2km", "Dưới 3km"].map((item) => (
               <div key={item} className={cx("inner_spacer")}>
                 <input
                   type="radio"
@@ -159,26 +162,28 @@ const Filter = ({ onFilter }) => {
         </div>
 
         <div className={cx("dien-tich-container")}>
-          <h2>Mức giá (triệu/tháng)</h2>
+          <h2 className={cx("title_desc")}>Mức giá (triệu/tháng)</h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
-              <input type="number"
-                name="tienThueMin"
+              <input
+                type="number"
+                name="giaMin"
                 className={cx("dien-tich-input")}
                 placeholder="Giá tối thiểu"
-                value={formData.tienThueMin}
+                value={formData.giaMin}
                 onChange={handleInputChange}
               />
             </div>
 
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
-              <input type="number"
-                name="tienThueMax"
+              <input
+                type="number"
+                name="giaMax"
                 className={cx("dien-tich-input")}
                 placeholder="Giá tối đa"
-                value={formData.tienThueMax}
+                value={formData.giaMax}
                 onChange={handleInputChange}
               />
             </div>
@@ -186,11 +191,12 @@ const Filter = ({ onFilter }) => {
         </div>
 
         <div className={cx("dien-tich-container")}>
-          <h2>Diện tích (m2)</h2>
+          <h2 className={cx("title_desc")}>Diện tích (m2)</h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
-              <input type="number"
+              <input
+                type="number"
                 name="kichThuocMin"
                 className={cx("dien-tich-input")}
                 placeholder="Diện tích tối thiểu"
@@ -201,7 +207,8 @@ const Filter = ({ onFilter }) => {
 
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
-              <input type="number"
+              <input
+                type="number"
                 name="kichThuocMax"
                 className={cx("dien-tich-input")}
                 placeholder="Diện tích tối đa"
@@ -212,11 +219,9 @@ const Filter = ({ onFilter }) => {
           </div>
         </div>
 
-
-
         <div className={cx("option")}>
           <div className={cx("form_group")}>
-            <h3 className={cx("form_title")}>Tiện nghi phòng</h3>
+            <h3 className={cx("title_desc")}>Tiện nghi phòng</h3>
             <div className={cx("option_item")}>
               {tienNghiList.map((item) => (
                 <div key={item.id} className={cx("item")}>
@@ -232,9 +237,8 @@ const Filter = ({ onFilter }) => {
             </div>
           </div>
 
-
-          <div className={cx("form_group")}>
-            <h3 className={cx("form_title")}>Thông tin thêm</h3>
+          {/* <div className={cx("form_group")}>
+            <h3 className={cx("title_desc")}>Thông tin thêm</h3>
             <div className={cx("option_item")}>
               {thongtinthemList.map((item) => (
                 <div key={item.id} className={cx("item")}>
@@ -248,14 +252,16 @@ const Filter = ({ onFilter }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className={cx("seperate")}></div>
-          <button className={cx("search")} onClick={handleSubmit}>Search</button>
+          <button className={cx("search")} onClick={handleSubmit}>
+            Search
+          </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Filter;

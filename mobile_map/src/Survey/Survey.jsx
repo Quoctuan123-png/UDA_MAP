@@ -5,7 +5,13 @@ import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import L from "leaflet";
 import styles from "./Survey.module.scss";
-import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Popup,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router-dom";
 import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import hàm fetchTienIch
@@ -14,18 +20,18 @@ import "react-toastify/dist/ReactToastify.css";
 
 const cx = classNames.bind(styles);
 
-const Survey = () => {
+const Survey = ({ onCloseSurvey }) => {
   const [showHide, setShowHide] = useState(false);
   const [showHideOne, setShowHideOne] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedArea, setSelectedArea] = useState("");
-  const [position, setPosition] = useState(null);// State để lưu tọa độ
+  const [position, setPosition] = useState(null); // State để lưu tọa độ
   const [tienNghiList, setTienNghiList] = useState([]); //lưu tiennghi
   const [thongtinthemList, setThongTinThemList] = useState([]); //lưu tiennghi
   const navigate = useNavigate();
   const [showMap, setShowMap] = useState(false);
   const [formData, setFormData] = useState({
-    tenPhongTro: "",
+    tenNhaTro: "",
     tenChuNha: "",
     diaChi: "",
     sdt: "",
@@ -43,7 +49,6 @@ const Survey = () => {
     lon: "", // Thêm trường tọa độ Y
     thongTinThem: [],
   });
-
 
   const houseIcon = new L.DivIcon({
     html: '<i class="fas fa-map-marker-alt" style="font-size: 24px; color: red;"></i>',
@@ -77,7 +82,6 @@ const Survey = () => {
     }));
   };
 
-
   // Box change1
   const handleCheckboxChange1 = (e) => {
     const { value, checked } = e.target;
@@ -90,16 +94,19 @@ const Survey = () => {
     }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       // Gửi thông tin trọ trước
       console.log("dữ liệu gửi đi:  ", formData);
-      const infoResponse = await axios.post("http://localhost:8000/api/nha-tro", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const infoResponse = await axios.post(
+        "http://localhost:8000/api/nha-tro",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       console.log("Kiểu dữ liệu:", infoResponse.data);
 
@@ -109,9 +116,13 @@ const Survey = () => {
         formDataImage.append("image", selectedImage); // Đổi key từ "image" thành "images"
         formDataImage.append("nhaTroId", infoResponse.data.nhaTro.id); // Gửi ID của nhà trọ lên backend
 
-        const imageResponse = await axios.post("http://localhost:8000/api/upload-single", formDataImage, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const imageResponse = await axios.post(
+          "http://localhost:8000/api/upload-single",
+          formDataImage,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
 
         console.log("Hình ảnh gửi thành công:", imageResponse.data);
       }
@@ -120,13 +131,18 @@ const Survey = () => {
       toast.success("Gửi thông tin thành công!");
     } catch (error) {
       if (error.response) {
-        console.error("Lỗi từ server:", error.response.status, error.response.data);
+        console.error(
+          "Lỗi từ server:",
+          error.response.status,
+          error.response.data
+        );
       } else if (error.request) {
         console.error("Không nhận được phản hồi từ server:", error.request);
       } else {
         console.error("Lỗi khi thiết lập request:", error.message);
       }
     }
+    alert("Gửi thông tin thành công!");
   };
 
   // Component để xử lý sự kiện bản đồ và lấy tọa độ
@@ -171,7 +187,7 @@ const Survey = () => {
     <div className={cx("wrapper")}>
       <header className={cx("header")}>
         <p className={cx("heading_title")}>GIỚI THIỆU NHÀ TRỌ</p>
-        <button className={cx("clear")} onClick={() => navigate(-1)}>
+        <button className={cx("clear")} onClick={onCloseSurvey}>
           <FontAwesomeIcon icon={faTimes} />
         </button>
       </header>
@@ -180,10 +196,10 @@ const Survey = () => {
           <h3 className={cx("form_title")}>Tên nhà trọ</h3>
           <input
             type="text"
-            name="tenPhongTro"
+            name="tenNhaTro"
             className={cx("form_input")}
             placeholder="Nhập tên trọ"
-            value={formData.tenPhongTro} // Ràng buộc với state
+            value={formData.tenNhaTro} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
           />
         </div>
@@ -236,10 +252,8 @@ const Survey = () => {
           />
         </div>
 
-
-
         <div className={cx("dien-tich-container")}>
-          <h2>Mức giá (VND/tháng) </h2>
+          <h2 className={cx("form_title")}>Mức giá (VND/tháng) </h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
@@ -252,7 +266,7 @@ const Survey = () => {
                 onChange={handleInputChange}
               />
             </div>
-            <p>   --   </p>
+            <p> -- </p>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
               <input
@@ -268,7 +282,7 @@ const Survey = () => {
         </div>
 
         <div className={cx("dien-tich-container")}>
-          <h2>Diện tích (m2)</h2>
+          <h2 className={cx("form_title")}>Diện tích (m2)</h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
@@ -281,7 +295,7 @@ const Survey = () => {
                 onChange={handleInputChange}
               />
             </div>
-            <p>   --   </p>
+            <p> -- </p>
             <div className={cx("dien-tich-item")}>
               <span className={cx("dien-tich-label")}></span>
               <input
@@ -295,8 +309,6 @@ const Survey = () => {
             </div>
           </div>
         </div>
-
-
 
         <div className={cx("form_group")}>
           <h3 className={cx("form_title")}>Giá điện</h3>
@@ -355,18 +367,16 @@ const Survey = () => {
           </div>
         </div>
 
-
-
-
         <div className={cx("form_group")}>
           <h3 className={cx("form_title")}>Upload Image</h3>
           <input
             type="file"
             accept="image/*"
+
             className={cx("form_input")}
             onChange={handleImageChange}
           />
-          {selectedImage && (
+          {/* {selectedImage && (
             <div>
               <img
                 className={cx("image_preview")}
@@ -374,9 +384,8 @@ const Survey = () => {
                 alt="Selected"
               />
             </div>
-          )}
+          )} */}
         </div>
-
 
         <div className={cx("form_group")}>
           <h3 className={cx("form_title")}>Ghi chú</h3>
@@ -393,7 +402,6 @@ const Survey = () => {
         <div className={cx("form_group")}>
           <h3 className={cx("form_title")}>Chọn vị trí trên bản đồ</h3>
           <MapContainer
-
             center={[16.032, 108.2212]}
             zoom={15}
             scrollWheelZoom={true}
