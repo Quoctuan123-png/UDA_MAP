@@ -9,7 +9,7 @@ import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import h�
 
 const cx = classNames.bind(styles);
 
-const Filter = ({ onFilter }) => {
+const Filter = ({ onFilter, onReset }) => {
   const [showMore, setShowMore] = useState(false);
   const [selectedArea, setSelectedArea] = useState("");
   const navigate = useNavigate();
@@ -89,15 +89,22 @@ const Filter = ({ onFilter }) => {
   // Hành động khi chọn trường radio
   const handleRadiusChange = (e) => {
     const value = e.target.value;
-    setSelectedArea(value); // Cập nhật state để hiển thị lựa chọn
-    // Trích xuất số km từ chuỗi và chuyển sang mét
-    const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
-    console.log(radius);
-    // Cập nhật formData với giá trị radius (đơn vị: mét)
-    setFormData((prev) => ({
-      ...prev,
-      radius: radius,
-    }));
+    if (selectedArea === value) {
+      // If clicking the same value, unselect it
+      setSelectedArea("");
+      setFormData((prev) => ({
+        ...prev,
+        radius: "",
+      }));
+    } else {
+      // If clicking a new value, select it
+      setSelectedArea(value);
+      const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
+      setFormData((prev) => ({
+        ...prev,
+        radius: radius,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -116,6 +123,7 @@ const Filter = ({ onFilter }) => {
       );
       console.log("Phản hồi từ API:", infoResponse.data);
       onFilter(infoResponse.data); // Gọi hàm onFilter với dữ liệu đã lọc
+      onReset();
     } catch (error) {
       if (error.response) {
         console.error(
@@ -145,8 +153,8 @@ const Filter = ({ onFilter }) => {
           </h3>
           <FontAwesomeIcon className={cx("down")} icon={faChevronDown} />
           <div className={cx("list_inner")}>
-            {["Dưới 1km", "Dưới 2km", "Dưới 3km"].map((item) => (
-              <div key={item} className={cx("inner_spacer")}>
+            {["Dưới 1km", "Dưới 2km", "Dưới 3km", "Không chọn"].map((item) => (
+              <label key={item} className={cx("inner_spacer")}>
                 <input
                   type="radio"
                   className={cx("inner_radio")}
@@ -156,7 +164,7 @@ const Filter = ({ onFilter }) => {
                   onChange={handleRadiusChange}
                 />
                 <p className={cx("inner_title")}>{item}</p>
-              </div>
+              </label>
             ))}
           </div>
         </div>
@@ -236,32 +244,14 @@ const Filter = ({ onFilter }) => {
               ))}
             </div>
           </div>
-
-          {/* <div className={cx("form_group")}>
-            <h3 className={cx("title_desc")}>Thông tin thêm</h3>
-            <div className={cx("option_item")}>
-              {thongtinthemList.map((item) => (
-                <div key={item.id} className={cx("item")}>
-                  <input
-                    type="checkbox"
-                    className={cx("option_checkbox")}
-                    value={item.id}
-                    onChange={handleCheckboxChange1}
-                  />
-                  <p className={cx("option_title")}>{item.thongTinThem}</p>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
-          <div className={cx("seperate")}></div>
-          <button className={cx("search")} onClick={handleSubmit}>
-            Search
-          </button>
         </div>
+        <div className={cx("seperate")}></div>
       </div>
+      <button className={cx("search")} onClick={handleSubmit}>
+        Search
+      </button>
     </div>
   );
 };
-
+//
 export default Filter;

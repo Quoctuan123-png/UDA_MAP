@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Carousel } from 'react-responsive-carousel';
+import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./HousePopupDetail.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import { getHouseDetail, fetchImage, fetchTienIch, fetchTienNghi, fetchThongTinThem } from "../../services/api"; // Import hàm fetchTienIch
+import {
+  getHouseDetail,
+  fetchImage,
+  fetchTienIch,
+  fetchTienNghi,
+  fetchThongTinThem,
+} from "../../services/api"; // Import hàm fetchTienIch
 
 const HousePopupDetail = ({ house, onCoordinatesr }) => {
   const [activeTab, setActiveTab] = useState("info");
@@ -13,10 +19,9 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
   const [houseState, sethouseState] = useState(null);
   const [images, setImages] = useState([]);
   const [thongTinThemList, setThongTinThem] = useState([]); // State để lưu trữ thông tin thêm từ nhà trọ
-  const [tienNghiList, setTienNghiList] = useState([]);// Lấy danh sách nội thất từ nhà trọ
+  const [tienNghiList, setTienNghiList] = useState([]); // Lấy danh sách nội thất từ nhà trọ
   const [thongTinThemListAll, setThongTinThemAll] = useState([]); // State để lưu trữ thông tin thêm từ API
-  const [tienNghiListAll, setTienNghiListAll] = useState([]);// Lấy danh sách nội thất từ API
-
+  const [tienNghiListAll, setTienNghiListAll] = useState([]); // Lấy danh sách nội thất từ API
 
   console.log("🏠 Dữ liệu nhà trọ:", house);
   const id = house.id;
@@ -37,9 +42,6 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
     fetchThongTinThemList();
   }, []);
 
-
-
-
   // Lấy danh sách tiện ích xung quanh từ API
   useEffect(() => {
     const fetchTienNghiList = async () => {
@@ -54,8 +56,6 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
 
     fetchTienNghiList();
   }, []);
-
-
 
   // // Xử lý lấy dữ liệu hình ảnh
   // useEffect(() => {
@@ -97,10 +97,6 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
     loadImages();
   }, [activeTab, id]);
 
-
-
-
-
   // Xử lý lấy dữ liệu nhà trọ
   useEffect(() => {
     const fetchHouse = async () => {
@@ -116,8 +112,6 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
 
         console.log("🏠 Dữ liệu tiện nghi:", data1.data.TienNghis);
 
-
-
         onCoordinatesr([...data1.data.lat]);
         console.log("🏠 Dữ liệu tọa độ của trọ:", data1.data.lat);
       } catch (error) {
@@ -128,19 +122,16 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
     fetchHouse();
   }, [id]);
 
-
-
-
   const handleTabChange = (tab) => setActiveTab(tab);
 
-
-
-  // Lọc ra danh sách nội thất 
+  // Lọc ra danh sách nội thất
   const tienNghiArray = Array.isArray(tienNghiList) ? tienNghiList : [];
   console.log("Danh sách nội thất:", tienNghiList);
 
   // Lọc ra danh sách thông tin thêm
-  const thongTinThemArray = Array.isArray(thongTinThemList) ? thongTinThemList : [];
+  const thongTinThemArray = Array.isArray(thongTinThemList)
+    ? thongTinThemList
+    : [];
   console.log("Danh sách thông tin thêm:", thongTinThemList);
 
   console.log("✅ Dữ liệu tất cả Ttt:", thongTinThemListAll);
@@ -155,13 +146,27 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
     return result;
   };
 
-
   return (
     <div className="popup-container">
       <div className="popup-tabs">
-        <button onClick={() => handleTabChange("info")} className={`tab-btn ${activeTab === "info" ? "active" : ""}`}>Thông tin</button>
-        <button onClick={() => handleTabChange("amenities")} className={`tab-btn ${activeTab === "amenities" ? "active" : ""}`}>Tiện nghi</button>
-        <button onClick={() => handleTabChange("image")} className={`tab-btn ${activeTab === "image" ? "active" : ""}`}>Hình ảnh</button>
+        <button
+          onClick={() => handleTabChange("info")}
+          className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
+        >
+          Thông tin
+        </button>
+        <button
+          onClick={() => handleTabChange("amenities")}
+          className={`tab-btn ${activeTab === "amenities" ? "active" : ""}`}
+        >
+          Tiện nghi
+        </button>
+        <button
+          onClick={() => handleTabChange("image")}
+          className={`tab-btn ${activeTab === "image" ? "active" : ""}`}
+        >
+          Hình ảnh
+        </button>
       </div>
 
       {/* Tabs content */}
@@ -187,7 +192,9 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
               </tr>
               <tr>
                 <th>Kích thước</th>
-                <td>{house.kichThuocMin} - {house.kichThuocMax} m²</td>
+                <td>
+                  {house.kichThuocMin} - {house.kichThuocMax} m²
+                </td>
               </tr>
               <tr>
                 <th>Số phòng</th>
@@ -197,7 +204,8 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
                 <th>Giá thuê</th>
                 <td>
                   {house.giaMin ? house.giaMin.toLocaleString() : "N/A"} -{" "}
-                  {house.giaMax ? house.giaMax.toLocaleString() : "N/A"} VND/tháng
+                  {house.giaMax ? house.giaMax.toLocaleString() : "N/A"}{" "}
+                  VND/tháng
                 </td>
               </tr>
               <tr>
@@ -216,18 +224,25 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
       {activeTab === "amenities" && (
         <div className="house-amenities-table">
           <div className="amenities-scroll-wrapper">
-            <p><b>Tiện nghi:</b></p>
+            <p>
+              <b>Tiện nghi:</b>
+            </p>
             <table>
               <tbody>
                 {chunkArray(tienNghiListAll, 2).map((row, index) => (
                   <tr key={index}>
                     {row.map((item) => {
-                      const isAvailable = tienNghiArray.some(nt => nt.id === item.id);
+                      const isAvailable = tienNghiArray.some(
+                        (nt) => nt.id === item.id
+                      );
                       return (
                         <td key={item.id}>
-                          <span className={`icon ${isAvailable ? "yes" : "no"}`}>
+                          <span
+                            className={`icon ${isAvailable ? "yes" : "no"}`}
+                          >
                             {isAvailable ? "✔️" : "❌"}
-                          </span> {item.tenTienNghi}
+                          </span>{" "}
+                          {item.tenTienNghi}
                         </td>
                       );
                     })}
@@ -237,18 +252,25 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
               </tbody>
             </table>
 
-            <p><b>Thông tin thêm:</b></p>
+            <p>
+              <b>Thông tin thêm:</b>
+            </p>
             <table>
               <tbody>
                 {chunkArray(thongTinThemListAll, 2).map((row, index) => (
                   <tr key={index}>
                     {row.map((item) => {
-                      const isAvailable = thongTinThemArray.some(nt => nt.id === item.id);
+                      const isAvailable = thongTinThemArray.some(
+                        (nt) => nt.id === item.id
+                      );
                       return (
                         <td key={item.id}>
-                          <span className={`icon ${isAvailable ? "yes" : "no"}`}>
+                          <span
+                            className={`icon ${isAvailable ? "yes" : "no"}`}
+                          >
                             {isAvailable ? "✔️" : "❌"}
-                          </span> {item.thongTinThem}
+                          </span>{" "}
+                          {item.thongTinThem}
                         </td>
                       );
                     })}
@@ -260,9 +282,6 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
           </div>
         </div>
       )}
-
-
-
 
       {activeTab === "image" && (
         <>
@@ -280,10 +299,8 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
           )}
         </>
       )}
-
     </div>
   );
 };
-
 
 export default HousePopupDetail;
