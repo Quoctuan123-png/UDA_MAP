@@ -227,7 +227,7 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
             }
 
           }}
-            style={{ color: "blue" , backgroundColor:"white"}}
+            style={{ color: "blue", backgroundColor: "white" }}
           >
             Xem chỉ dẫn tới trọ
           </a>
@@ -279,11 +279,11 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
               </tbody>
             </table>
 
-            <p><b>Tình trạng:</b></p>
-            <td style={{ color: house.conPhong ? "green" : "red", fontWeight: "bold" }}>
-              {house.conPhong ? "Còn phòng" : "Hết phòng"}
-            </td>
-            <td> Cập nhật {new Date(house.updatedAt).toLocaleString()}</td>
+            <p><b>Tình trạng:</b> <b style={{ color: house.conPhong ? "green" : "red", fontWeight: "bold" }}>
+              {house.conPhong ? "Còn phòng" : "Hết phòng"}</b>
+            </p>
+
+            <p> Cập nhật {new Date(house.updatedAt).toLocaleString()}</p>
             <p style={{ color: "red" }}><b>Lưu ý:</b></p>
             <p>{house.ghiChu.toLocaleString()}</p>
 

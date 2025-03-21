@@ -15,7 +15,7 @@
 
 
 
-.leaflet-popup-content-wrapper.popup-school {
+.leaflet-popup-content-wrapper .popup-school {
     max-width: 220px;
     background-color: #eaf6ff;
     border-radius: 10px;
@@ -85,6 +85,25 @@
     /* Thay đổi kích thước hình ảnh */
     height: 60px;
     /* Thay đổi kích thước hình ảnh */
+    border-radius: 50%;
+    /* Làm tròn hình ảnh */
+    object-fit: cover;
+    /* Đảm bảo hình ảnh không bị vỡ */
+}
+
+.custom-div-iconxanh {
+    width: 60px;
+    /* Thay đổi kích thước hình ảnh */
+    height: 60px;
+    /* Thay đổi kích thước hình ảnh */
+    border-radius: 50%;
+    /* Làm tròn hình ảnh */
+    object-fit: cover;
+    /* Đảm bảo hình ảnh không bị vỡ */
+    font-size: 20px;
+}
+
+.custom-div-iconuni {
     border-radius: 50%;
     /* Làm tròn hình ảnh */
     object-fit: cover;

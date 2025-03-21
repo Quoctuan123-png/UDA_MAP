@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Tooltip} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import { fetchLocations } from "../../services/api";
 import CustomPopup from "../Popup/CustomPopup";
@@ -20,7 +20,11 @@ const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
                 const latitude = parseFloat(house.lat);
                 const longitude = parseFloat(house.lon);
                 if (isNaN(latitude) || isNaN(longitude)) return null;
-                return { ...house, latitude, longitude };
+                return {
+                    ...house,
+                    latitude,
+                    longitude
+                };
             })
             .filter((house) => house !== null);
     };
@@ -33,10 +37,11 @@ const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
                     const formatted = formatHouses(filteredData1);
                     setFilteredHouses(formatted);
                 } else {
-                    console.log("📥 Lấy dữ liệu từ API vì filteredData1 rỗng...");
+
                     const data = await fetchLocations();
                     const formatted = formatHouses(data);
                     setFilteredHouses(formatted);
+                    console.log("📥 Lấy dữ liệu từ API vì filteredData1 rỗng...", data);
                 }
             } catch (error) {
                 console.error("❌ Lỗi khi tải dữ liệu nhà trọ:", error);
@@ -54,13 +59,25 @@ const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
         popupAnchor: [0, -30],
     });
 
-    const houseIcon = new L.Icon({
+    const housedoIcon = new L.Icon({
         iconUrl: "images/logohouse-removebg-preview.png",
         className: "custom-div-icon",
         iconSize: [35, 35],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30],
     });
+
+    const housexanhIcon = new L.Icon({
+        iconUrl: "images/logoxanh.png",
+        className: "custom-div-iconxanh",
+        iconSize: [45, 45],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+    });
+
+
+    const getHouseIconByStatus = (status) =>
+        status ? housexanhIcon : housedoIcon;
 
     return (
         <div className="map">
@@ -103,10 +120,11 @@ const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
                 </Marker>
 
                 {filteredHouses.map((house, index) => (
+
                     <Marker
                         key={index}
                         position={[house.latitude, house.longitude]}
-                        icon={houseIcon}
+                        icon={getHouseIconByStatus(house.conPhong)}
                     >
                         <Popup className="popup-hostel">
                             <CustomPopup house={house} onCoordinatesr={onCoordinatesr} onShowRouting={onShowRouting} />

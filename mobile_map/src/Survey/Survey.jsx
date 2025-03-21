@@ -101,7 +101,7 @@ const Survey = ({ onCloseSurvey }) => {
       // Gửi thông tin trọ trước
       console.log("dữ liệu gửi đi:  ", formData);
       const infoResponse = await axios.post(
-        "https://26b9-42-114-92-17.ngrok-free.app/api/nha-tro",
+        "http://localhost:8000/api/nha-tro",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -117,7 +117,7 @@ const Survey = ({ onCloseSurvey }) => {
         formDataImage.append("nhaTroId", infoResponse.data.nhaTro.id); // Gửi ID của nhà trọ lên backend
 
         const imageResponse = await axios.post(
-          "https://26b9-42-114-92-17.ngrok-free.app/api/upload-single",
+          "http://localhost:8000/api/upload-single",
           formDataImage,
           {
             headers: { "Content-Type": "multipart/form-data" },
