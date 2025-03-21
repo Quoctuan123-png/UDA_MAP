@@ -1,6 +1,6 @@
 import axios from "axios";
-const API_URL = "http://localhost:8000";
-// const API_URL = "https://3b91-1-53-87-20.ngrok-free.app";
+// const API_URL = "http://localhost:8000";
+const API_URL = "https://26b9-42-114-92-17.ngrok-free.app";
 
 
 
@@ -89,14 +89,20 @@ export const fetchImage = async (Id) => {
 };
 
 // Hàm tìm tọa độ từ địa chỉ
-export const fetchFind = async (Id) => {
+export const fetchFind = async (formData) => {
     try {
-        const response = await fetch(`${API_URL}/api/find-nha-tro`, {
-            headers: {
-                "ngrok-skip-browser-warning": "true"
+        const response = axios.post(`${API_URL}/api/find-nha-tro`,
+            formData,
+            {
+                headers: { "Content-Type": "application/json" },
             }
-        });
-        const data = await response.json();
+        );
+        // const response = await axios.post(`${API_URL}/api/find-nha-tro`, {
+        //     headers: {
+        //         "ngrok-skip-browser-warning": "true"
+        //     }
+        // });
+        const data = await response;
         console.log(data)
         return data;
     } catch (error) {

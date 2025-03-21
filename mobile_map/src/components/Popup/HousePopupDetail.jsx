@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { getHouseDetail, fetchImage, fetchTienIch, fetchTienNghi, fetchThongTinThem } from "../../services/api"; // Import hàm fetchTienIch
 
-const HousePopupDetail = ({ house, onCoordinatesr }) => {
+const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   const [activeTab, setActiveTab] = useState("info");
 
   const [houseState, sethouseState] = useState(null);
@@ -106,7 +106,7 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
     const fetchHouse = async () => {
       try {
         const data1 = await getHouseDetail(id);
-        sethouseState(data1.data);
+        console.log("khanhhhhhhhhhhhh", data1.data)
         console.log("🏠 Dữ liệu nhà trọ:", data1.data);
 
         setThongTinThem([...data1.data.ThongTinThems]); // Cập nhật state thông tin thêm của nhà trọ
@@ -115,11 +115,15 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
         setTienNghiList([...data1.data.TienNghis]); // Cập nhật state tiện nghi của nhà trọ
 
         console.log("🏠 Dữ liệu tiện nghi:", data1.data.TienNghis);
+        sethouseState(data1.data);
 
 
 
-        onCoordinatesr([...data1.data.lat]);
-        console.log("🏠 Dữ liệu tọa độ của trọ:", data1.data.lat);
+        if (typeof onCoordinatesr === "function") {
+          const coordinates = { lat: data1.data.lat, lng: data1.data.lon };
+          onCoordinatesr(coordinates);
+          console.log("🏠 Dữ liệu tọa độ của trọ:", coordinates); // <--- log đúng dữ liệu
+        }
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu nhà trọ:", error);
       }
@@ -159,8 +163,8 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
   return (
     <div className="popup-container">
       <div className="popup-tabs">
-        <button onClick={() => handleTabChange("info")} className={`tab-btn ${activeTab === "info" ? "active" : ""}`}>Thông tin</button>
-        <button onClick={() => handleTabChange("amenities")} className={`tab-btn ${activeTab === "amenities" ? "active" : ""}`}>Tiện nghi</button>
+        <button onClick={() => handleTabChange("info")} className={`tab-btn ${activeTab === "info" ? "active" : ""}`}>Giới thiệu</button>
+        <button onClick={() => handleTabChange("amenities")} className={`tab-btn ${activeTab === "amenities" ? "active" : ""}`}>Chi tiết</button>
         <button onClick={() => handleTabChange("image")} className={`tab-btn ${activeTab === "image" ? "active" : ""}`}>Hình ảnh</button>
       </div>
 
@@ -208,8 +212,25 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
                 <th>Giá nước</th>
                 <td>{house.tienNuoc.toLocaleString()} VND/m³</td>
               </tr>
+              <tr>
+                <th>Khoảng cách tới trường</th>
+                <td> {house.khoangCachTruong} m
+                </td>
+              </tr>
             </tbody>
           </table>
+
+          <a href="#" onClick={(e) => {
+            e.preventDefault();
+            if (typeof onShowRouting === "function") {
+              onShowRouting(); // gọi hàm từ cha và truyền house hiện tại
+            }
+
+          }}
+            style={{ color: "blue" , backgroundColor:"white"}}
+          >
+            Xem chỉ dẫn tới trọ
+          </a>
         </div>
       )}
 
@@ -257,6 +278,15 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
                 ))}
               </tbody>
             </table>
+
+            <p><b>Tình trạng:</b></p>
+            <td style={{ color: house.conPhong ? "green" : "red", fontWeight: "bold" }}>
+              {house.conPhong ? "Còn phòng" : "Hết phòng"}
+            </td>
+            <td> Cập nhật {new Date(house.updatedAt).toLocaleString()}</td>
+            <p style={{ color: "red" }}><b>Lưu ý:</b></p>
+            <p>{house.ghiChu.toLocaleString()}</p>
+
           </div>
         </div>
       )}
@@ -266,7 +296,7 @@ const HousePopupDetail = ({ house, onCoordinatesr }) => {
 
       {activeTab === "image" && (
         <>
-          <h4>Hình ảnh nhà trọ</h4>
+
           {images.length > 0 ? (
             <Carousel showThumbs={false} infiniteLoop autoPlay>
               {images.map((img, index) => (

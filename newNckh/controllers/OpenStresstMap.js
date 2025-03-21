@@ -20,7 +20,7 @@ const createCoordinates = async (address) => {
 
     }
 }
-// tính khoảng cách giữa các tọa độđộ
+// tính khoảng cách giữa các tọa độ
 const calculateHaversineDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Bán kính Trái đất (km)
     const toRad = angle => (angle * Math.PI) / 180; // Chuyển độ sang radian

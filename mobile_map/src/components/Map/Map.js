@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip} from "react-leaflet";
 import L from "leaflet";
 import { fetchLocations } from "../../services/api";
 import CustomPopup from "../Popup/CustomPopup";
 import "./Map.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 const universityLocation = [16.032, 108.2212];
 
-const Map = ({ filteredData1,onCoordinatesr  }) => {
+const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
     const [filteredHouses, setFilteredHouses] = useState([]);
 
     // 📌 Hàm chuẩn hóa dữ liệu vị trí
@@ -71,6 +73,14 @@ const Map = ({ filteredData1,onCoordinatesr  }) => {
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                 <Marker position={universityLocation} icon={universityIcon}>
+                    <Tooltip
+                        direction="top"
+                        offset={[10, 0]} // 👈 Dịch tooltip qua trái (giá trị âm sẽ đẩy sang trái)
+                        opacity={1}
+                        permanent
+                    >
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>Trường Đại học Đông Á</div>
+                    </Tooltip>
                     <Popup>
                         <div className="popup-container">
                             <div className="popup-image">
@@ -99,7 +109,7 @@ const Map = ({ filteredData1,onCoordinatesr  }) => {
                         icon={houseIcon}
                     >
                         <Popup className="popup-hostel">
-                            <CustomPopup house={house} />
+                            <CustomPopup house={house} onCoordinatesr={onCoordinatesr} onShowRouting={onShowRouting} />
                         </Popup>
                     </Marker>
                 ))}

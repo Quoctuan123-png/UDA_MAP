@@ -12,6 +12,10 @@ const { NhaTro, TienNghi, TienNghiNhaTro, ThongTinThemNhaTro, ThongTinThem } = r
 const createNhaTro = async (req, res) => {
     try {
         // Lấy dữ liệu từ request
+        const distance = calculateHaversineDistance(
+            16.03219245, 108.22099429613442, // Toạ độ ĐH Đông Á
+            parseFloat(req.body.lat), parseFloat(req.body.lon)
+        );
         const nhaTroData = {
             tenNhaTro: req.body.tenNhaTro,
             diaChi: req.body.diaChi,
@@ -30,6 +34,7 @@ const createNhaTro = async (req, res) => {
             ghiChu: req.body.ghiChu,
             nguoiGioiThieu: req.body.nguoiGioiThieu,
             nguoiDuyet: req.body.nguoiDuyet,
+            khoangCachTruong: distance
         };
 
         // Tạo nhà trọ mới
@@ -81,6 +86,7 @@ const getAllNhaTro = async (req, res) => {
     try {
         const nhaTroList = await NhaTro.findAll();
         // const noiThatList = await NoiThat.findAll();
+
         res.status(200).json(nhaTroList);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -222,6 +228,7 @@ const getRoom = async (req, res) => {
         const { idNhaTro } = req.params;
 
         // Tìm thông tin nhà trọ
+
         const listRoom = await NhaTro.findOne({
             where: { id: idNhaTro },
             include: [
@@ -236,6 +243,7 @@ const getRoom = async (req, res) => {
                     attributes: ["id", "ThongtinThem"]
                 }
             ]
+
         });
 
         if (!listRoom) {

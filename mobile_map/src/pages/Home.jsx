@@ -12,12 +12,21 @@ const Home = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [houses, setHouses] = useState([]);
     const [coordinates, setCoordinates] = useState([]);
+    const [showRouting, setShowRouting] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null); // Dữ liệu phòng trọ được chọn
 
 
+    const handleShowRouting = () => {
+        setShowRouting(true);
+    };
+
+    const handleBackToMap = () => {
+        setShowRouting(false);
+    };
 
     const handleFilter = (data) => {
         setFilteredData(data); // Cập nhật dữ liệu từ Filter  
-        console.log(data)
+        console.log(data.length)
     };
 
 
@@ -47,14 +56,29 @@ const Home = () => {
 
     return (
         <div className="home_wrapper">
-            <FontAwesomeIcon
-                className="icon_right"
-                icon={faCaretRight}
-                onClick={toggleInner} // Thêm sự kiện click
-            />
-            <Header isInnerVisible={isInnerVisible} onReset={resetInner} onFilter={handleFilter} />
-            <Map houses={houses} filteredData1={filteredData} onCoordinatesr={handleCoordinates} />
-            <Directions Coordinates={coordinates} />
+
+
+            {/* <Map houses={houses} filteredData1={filteredData} onCoordinatesr={handleCoordinates} />
+            <Directions Coordinates={coordinates} /> */}
+
+
+
+            {!showRouting ? (
+                <>
+                    <FontAwesomeIcon
+                        className="icon_right"
+                        icon={faCaretRight}
+                        onClick={toggleInner} // Thêm sự kiện click
+                    />
+                    <Header isInnerVisible={isInnerVisible} onReset={resetInner} onFilter={handleFilter} />
+                    <Map houses={houses} filteredData1={filteredData} onCoordinatesr={handleCoordinates} onShowRouting={handleShowRouting} />
+                </>
+
+
+            ) : (
+                <Directions Coordinates={coordinates} onBack={handleBackToMap} />
+            )}
+
         </div>
     );
 };

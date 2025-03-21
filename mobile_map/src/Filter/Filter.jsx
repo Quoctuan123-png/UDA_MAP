@@ -5,7 +5,7 @@ import axios from "axios";
 import styles from "./Filter.module.scss";
 import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import hàm fetchTienIch
+import { fetchTienNghi, fetchThongTinThem, fetchFind } from "../services/api"; // Import hàm fetchTienIch
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +13,7 @@ const Filter = ({ onFilter }) => {
   const [showMore, setShowMore] = useState(false);
   const [selectedArea, setSelectedArea] = useState("");
   const navigate = useNavigate();
+  const [lengthdata, setlenghtdata] = useState(null)
   const [tienNghiList, setTienNghiList] = useState([]); //lưu tiennghi
   const [thongtinthemList, setThongTinThemList] = useState([]); //lưu tiennghi
   const [formData, setFormData] = useState({
@@ -107,14 +108,16 @@ const Filter = ({ onFilter }) => {
       // Gửi thông tin trọ
       console.log(formData);
 
-      const infoResponse = await axios.post(
-        "http://localhost:8000/api/find-nha-tro",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      // const infoResponse = await axios.post(
+      //   "http://localhost:8000/api/find-nha-tro",
+      //   formData,
+      //   {
+      //     headers: { "Content-Type": "application/json" },
+      //   }
+      // );
+      const infoResponse = await fetchFind(formData)
       console.log("Phản hồi từ API:", infoResponse.data);
+      setlenghtdata(infoResponse.data.length)
       onFilter(infoResponse.data); // Gọi hàm onFilter với dữ liệu đã lọc
     } catch (error) {
       if (error.response) {
@@ -255,8 +258,13 @@ const Filter = ({ onFilter }) => {
           </div> */}
 
           <div className={cx("seperate")}></div>
+          {lengthdata !== null && lengthdata !== undefined && (
+            <div style={{ textAlign: "center", fontWeight: "bold", color: "red" }}>
+              Có {lengthdata} phòng phù hợp với bạn
+            </div>
+          )}
           <button className={cx("search")} onClick={handleSubmit}>
-            Search
+            Tìm ngay
           </button>
         </div>
       </div>
