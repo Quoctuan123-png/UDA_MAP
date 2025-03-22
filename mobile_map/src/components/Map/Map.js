@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip ,useMap} from "react-leaflet";
 import L from "leaflet";
 import { fetchLocations } from "../../services/api";
 import CustomPopup from "../Popup/CustomPopup";
 import "./Map.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'leaflet.fullscreen/Control.FullScreen.css';
+import 'leaflet.fullscreen';
 
 
 const universityLocation = [16.032, 108.2212];
+
+
+const FullscreenControl = () => {
+    const map = useMap();
+
+    useEffect(() => {
+        L.control.fullscreen({
+            position: 'topleft',
+            title: 'Xem toàn màn hình',
+            titleCancel: 'Thoát toàn màn hình',
+        }).addTo(map);
+    }, [map]);
+
+    return null;
+};
 
 const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
     const [filteredHouses, setFilteredHouses] = useState([]);
@@ -80,6 +97,7 @@ const Map = ({ filteredData1, onCoordinatesr, onShowRouting }) => {
                 center={universityLocation}
                 zoom={15}
                 scrollWheelZoom={true}
+                fullscreenControl={true}
                 style={{ width: "100%", height: "100%" }}
             >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
