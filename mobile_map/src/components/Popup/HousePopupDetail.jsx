@@ -112,7 +112,6 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
         setThongTinThem([...data1.data.ThongTinThems]); // Cập nhật state thông tin thêm của nhà trọ
         console.log("🏠 Dữ liệu thông tin thêm:", data1.data.ThongTinThems);
 
-        setTienNghiList([...data1.data.TienNghis]); // Cập nhật state tiện nghi của nhà trọ
 
         console.log("🏠 Dữ liệu tiện nghi:", data1.data.TienNghis);
         sethouseState(data1.data);
@@ -214,8 +213,17 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
               </tr>
               <tr>
                 <th>Khoảng cách tới trường</th>
-                <td> {house.khoangCachTruong} m
+                <td> {house.khoangCachTruong} m</td>
+              </tr>
+              <tr>
+                <th>Tình trạng</th>
+                <td><b style={{ color: house.conPhong ? "green" : "red", fontWeight: "bold" }}>
+                  {house.conPhong ? "Còn phòng" : "Hết phòng"}</b>
                 </td>
+              </tr>
+              <tr>
+                <th>Cập nhật</th>
+                <td>{new Date(house.updatedAt).toLocaleString()}</td>
               </tr>
             </tbody>
           </table>
@@ -240,10 +248,10 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
             <p><b>Tiện nghi:</b></p>
             <table>
               <tbody>
-                {chunkArray(tienNghiListAll, 2).map((row, index) => (
+                {Array.isArray(tienNghiListAll) && chunkArray(tienNghiListAll, 2).map((row, index) => (
                   <tr key={index}>
                     {row.map((item) => {
-                      const isAvailable = tienNghiArray.some(nt => nt.id === item.id);
+                      const isAvailable = Array.isArray(tienNghiArray) && tienNghiArray.some(nt => nt.id === item.id);
                       return (
                         <td key={item.id}>
                           <span className={`icon ${isAvailable ? "yes" : "no"}`}>
@@ -252,11 +260,13 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
                         </td>
                       );
                     })}
+                    {/* Nếu hàng chỉ có 1 cột thì thêm 1 <td> để đủ 2 cột */}
                     {row.length < 2 && <td></td>}
                   </tr>
                 ))}
               </tbody>
             </table>
+
 
             <p><b>Thông tin thêm:</b></p>
             <table>
@@ -279,11 +289,7 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
               </tbody>
             </table>
 
-            <p><b>Tình trạng:</b> <b style={{ color: house.conPhong ? "green" : "red", fontWeight: "bold" }}>
-              {house.conPhong ? "Còn phòng" : "Hết phòng"}</b>
-            </p>
 
-            <p> Cập nhật {new Date(house.updatedAt).toLocaleString()}</p>
             <p style={{ color: "red" }}><b>Lưu ý:</b></p>
             <p>{house.ghiChu.toLocaleString()}</p>
 

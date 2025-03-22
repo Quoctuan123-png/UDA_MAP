@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCamera,
+  faChevronDown,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import L from "leaflet";
 import styles from "./Survey.module.scss";
@@ -20,7 +24,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const cx = classNames.bind(styles);
 
-const Survey = ({ onCloseSurvey }) => {
+const Survey = ({ onCloseSurvey, showModal }) => {
   const [showHide, setShowHide] = useState(false);
   const [showHideOne, setShowHideOne] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -30,6 +34,8 @@ const Survey = ({ onCloseSurvey }) => {
   const [thongtinthemList, setThongTinThemList] = useState([]); //lưu tiennghi
   const navigate = useNavigate();
   const [showMap, setShowMap] = useState(false);
+  const [lengthdata, setlenghtdata] = useState(null);
+
   const [formData, setFormData] = useState({
     tenNhaTro: "",
     tenChuNha: "",
@@ -50,6 +56,81 @@ const Survey = ({ onCloseSurvey }) => {
     thongTinThem: [],
   });
 
+  // Thêm state để lưu lỗi
+  const [errors, setErrors] = useState({
+    sdt: "",
+    diaChi: "",
+    giaMin: "",
+    giaMax: "",
+    soPhong: "",
+  });
+
+  // Hàm validate số điện thoại
+  const validatePhone = (phone) => {
+    const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+    return phoneRegex.test(phone);
+  };
+
+  // Sửa lại hàm handleInputChange
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "soPhong") {
+      // Chỉ cho phép nhập số và giới hạn 2 chữ số
+      if (value.length <= 2 && /^\d*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+        setErrors((prev) => ({
+          ...prev,
+          soPhong: value
+            ? value > 0
+              ? ""
+              : "Số phòng phải lớn hơn 0"
+            : "Vui lòng nhập số phòng",
+        }));
+      }
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
+
+    // Validate từng trường khi người dùng nhập
+    switch (name) {
+      case "sdt":
+        setErrors((prev) => ({
+          ...prev,
+          sdt: !value
+            ? "Vui lòng nhập số điện thoại"
+            : !validatePhone(value)
+              ? "Số điện thoại không hợp lệ"
+              : "",
+        }));
+        break;
+      case "diaChi":
+        setErrors((prev) => ({
+          ...prev,
+          diaChi: !value.trim() ? "Vui lòng nhập địa chỉ" : "",
+        }));
+        break;
+      case "giaMin":
+      case "giaMax":
+        const min =
+          name === "giaMin" ? parseInt(value) : parseInt(formData.giaMin);
+        const max =
+          name === "giaMax" ? parseInt(value) : parseInt(formData.giaMax);
+
+        setErrors((prev) => ({
+          ...prev,
+          giaMin: !min ? "Vui lòng nhập giá tối thiểu" : "",
+          giaMax: !max
+            ? "Vui lòng nhập giá tối đa"
+            : min > max && max
+              ? "Giá tối thiểu không được lớn hơn giá tối đa"
+              : "",
+        }));
+        break;
+      default:
+        break;
+    }
+  };
+
   const houseIcon = new L.DivIcon({
     html: '<i class="fas fa-map-marker-alt" style="font-size: 24px; color: red;"></i>',
     className: "custom-div-icon",
@@ -59,9 +140,9 @@ const Survey = ({ onCloseSurvey }) => {
   });
 
   // Nhập input
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // const handleInputChange = (e) => {
+  //   setFormData({ ...formData, [e.target.name]: e.target.value });
+  // };
 
   // Chọn ảnh
   const handleImageChange = (event) => {
@@ -97,6 +178,36 @@ const Survey = ({ onCloseSurvey }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate tất cả các trường trước khi submit
+    const newErrors = {
+      sdt: !formData.sdt
+        ? "Vui lòng nhập số điện thoại"
+        : !validatePhone(formData.sdt)
+          ? "Số điện thoại không hợp lệ"
+          : "",
+      diaChi: !formData.diaChi.trim() ? "Vui lòng nhập địa chỉ" : "",
+      giaMin: !formData.giaMin ? "Vui lòng nhập giá tối thiểu" : "",
+      giaMax: !formData.giaMax
+        ? "Vui lòng nhập giá tối đa"
+        : parseInt(formData.giaMin) > parseInt(formData.giaMax)
+          ? "Giá tối thiểu không được lớn hơn giá tối đa"
+          : "",
+
+      // Thêm validation cho số phòng
+      soPhong: !formData.soPhong
+        ? "Vui lòng nhập số phòng"
+        : formData.soPhong <= 0
+          ? "Số phòng phải lớn hơn 0"
+          : "",
+    };
+
+    setErrors(newErrors);
+
+    // Kiểm tra nếu có lỗi thì không submit
+    if (Object.values(newErrors).some((error) => error)) {
+      return;
+    }
+
     try {
       // Gửi thông tin trọ trước
       console.log("dữ liệu gửi đi:  ", formData);
@@ -128,7 +239,8 @@ const Survey = ({ onCloseSurvey }) => {
       }
 
       // Thông báo gửi thông tin thành công
-      toast.success("Gửi thông tin thành công!");
+      showModal();
+      onCloseSurvey();
     } catch (error) {
       if (error.response) {
         console.error(
@@ -142,7 +254,6 @@ const Survey = ({ onCloseSurvey }) => {
         console.error("Lỗi khi thiết lập request:", error.message);
       }
     }
-    alert("Gửi thông tin thành công!");
   };
 
   // Component để xử lý sự kiện bản đồ và lấy tọa độ
@@ -160,8 +271,7 @@ const Survey = ({ onCloseSurvey }) => {
     });
 
     return position === null ? null : (
-      <Marker position={position} icon={houseIcon}>
-      </Marker>
+      <Marker position={position} icon={houseIcon}></Marker>
     );
   };
 
@@ -192,63 +302,75 @@ const Survey = ({ onCloseSurvey }) => {
       </header>
       <div className={cx("content")}>
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Tên nhà trọ</h3>
           <input
             type="text"
             name="tenNhaTro"
             className={cx("form_input")}
-            placeholder="Nhập tên trọ"
-            value={formData.tenNhaTro} // Ràng buộc với state
-            onChange={handleInputChange} // Cập nhật state khi nhập
+            placeholder=" " // Placeholder trống để trigger :not(:placeholder-shown)
+            value={formData.tenNhaTro}
+            onChange={handleInputChange}
           />
+          <label className={cx("form-intern-label")}>Tên trọ</label>
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Tên chủ trọ</h3>
           <input
             type="text"
             name="tenChuNha"
             value={formData.tenChuNha} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
             className={cx("form_input")}
-            placeholder="Nhập họ và tên"
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>Tên chủ trọ</label>
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Số điện thoại chủ trọ</h3>
           <input
             type="text"
             name="sdt"
             value={formData.sdt} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
-            className={cx("form_input")}
-            placeholder="Nhập số điện thoại"
+            className={cx("form_input", errors.sdt && "error")}
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>
+            Số điện thoại chủ trọ
+          </label>
+          {errors.sdt && (
+            <span className={cx("error-message")}>{errors.sdt}</span>
+          )}
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Địa chỉ nhà trọ</h3>
           <input
             type="text"
             name="diaChi"
             value={formData.diaChi} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
-            className={cx("form_input")}
-            placeholder="Nhập số nhà, đường, quận, thành phố"
+            className={cx("form_input", errors.diaChi && "error")}
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>Địa chỉ nhà trọ</label>
+          {errors.diaChi && (
+            <span className={cx("error-message")}>{errors.diaChi}</span>
+          )}
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Số phòng trọ</h3>
           <input
             type="text"
             name="soPhong"
-            value={formData.soPhong} // Ràng buộc với state
-            onChange={handleInputChange} // Cập nhật state khi nhập
-            className={cx("form_input")}
-            placeholder="Nhập tổng số phòng trọ"
+            value={formData.soPhong}
+            onChange={handleInputChange}
+            className={cx("form_input", errors.soPhong && "error")}
+            placeholder=" "
+            maxLength="2" // Thêm maxLength
           />
+          <label className={cx("form-intern-label")}>Số phòng trọ</label>
+          {errors.soPhong && (
+            <span className={cx("error-message")}>{errors.soPhong}</span>
+          )}
         </div>
 
         <div className={cx("dien-tich-container")}>
@@ -259,11 +381,16 @@ const Survey = ({ onCloseSurvey }) => {
               <input
                 type="number"
                 name="giaMin"
-                className={cx("dien-tich-input")}
+                className={cx("dien-tich-input", errors.giaMin && "error")}
                 placeholder="Nhập giá tối thiểu"
                 value={formData.giaMin}
                 onChange={handleInputChange}
               />
+              {errors.giaMin && (
+                <span className={cx("error-message-price")}>
+                  {errors.giaMin}
+                </span>
+              )}
             </div>
             <p> -- </p>
             <div className={cx("dien-tich-item")}>
@@ -271,11 +398,16 @@ const Survey = ({ onCloseSurvey }) => {
               <input
                 type="number"
                 name="giaMax"
-                className={cx("dien-tich-input")}
+                className={cx("dien-tich-input", errors.giaMax && "error")}
                 placeholder="Nhập giá tối đa"
                 value={formData.giaMax}
                 onChange={handleInputChange}
               />
+              {errors.giaMax && (
+                <span className={cx("error-message-price")}>
+                  {errors.giaMax}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -310,30 +442,36 @@ const Survey = ({ onCloseSurvey }) => {
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Giá điện</h3>
           <input
             type="text"
             name="tienDien"
             value={formData.tienDien} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
             className={cx("form_input")}
-            placeholder="Nhập giá điện (VNĐ/kWh)"
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>
+            {" "}
+            Nhập giá điện (VNĐ/kWh)
+          </label>
         </div>
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Giá nước</h3>
           <input
             type="text"
             name="tienNuoc"
             value={formData.tienNuoc} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
             className={cx("form_input")}
-            placeholder="Nhập giá nước (VNĐ/m³)"
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>
+            {" "}
+            Nhập giá nước (VNĐ/m³)
+          </label>
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Tiện nghi phòng</h3>
+          <h3 className={cx("title_map")}>Tiện nghi phòng</h3>
           <div className={cx("option_item")}>
             {tienNghiList.map((item) => (
               <div key={item.id} className={cx("item")}>
@@ -350,7 +488,7 @@ const Survey = ({ onCloseSurvey }) => {
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Thông tin thêm</h3>
+          <h3 className={cx("title_map")}>Thông tin thêm</h3>
           <div className={cx("option_item")}>
             {thongtinthemList.map((item) => (
               <div key={item.id} className={cx("item")}>
@@ -367,14 +505,18 @@ const Survey = ({ onCloseSurvey }) => {
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Upload Image</h3>
-          <input
-            type="file"
-            accept="image/*"
-
-            className={cx("form_input")}
-            onChange={handleImageChange}
-          />
+          <label className={cx("file-input-label")}>
+            <input
+              type="file"
+              accept="image/*"
+              className={cx("form_input", "file-input")}
+              onChange={handleImageChange}
+            />
+            <span className={cx("file-input-text")}>
+              Thêm ảnh trọ
+              <FontAwesomeIcon icon={faCamera} />
+            </span>
+          </label>
           {/* {selectedImage && (
             <div>
               <img
@@ -387,19 +529,35 @@ const Survey = ({ onCloseSurvey }) => {
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Ghi chú</h3>
           <input
             type="text"
             name="ghiChu"
             value={formData.ghiChu} // Ràng buộc với state
             onChange={handleInputChange} // Cập nhật state khi nhập
             className={cx("form_input")}
-            placeholder="Nhập ghi chú"
+            placeholder=" "
           />
+          <label className={cx("form-intern-label")}>Nhập ghi chú</label>
         </div>
 
         <div className={cx("form_group")}>
-          <h3 className={cx("form_title")}>Chọn vị trí trên bản đồ</h3>
+          <input
+            type="text"
+            name="idsv"
+            id="idsv"
+            className={cx("form_input", "idsv_input")}
+            placeholder=" "
+          />
+          <label className={cx("form-intern-label")}>
+            Người giới thiệu (IDSV)
+          </label>
+          <p className={cx("form_input-id")}>
+            *Nhập id để thêm điểm chuyên cần*
+          </p>
+        </div>
+
+        <div className={cx("form_group")}>
+          <h3 className={cx("title_map")}>Chọn vị trí trên bản đồ</h3>
           <MapContainer
             center={[16.032, 108.2212]}
             zoom={15}
@@ -412,7 +570,7 @@ const Survey = ({ onCloseSurvey }) => {
         </div>
 
         <button className={cx("btn")} onClick={handleSubmit}>
-          Submit
+          Gửi
         </button>
       </div>
     </div>

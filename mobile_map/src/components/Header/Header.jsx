@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSwipeable } from "react-swipeable";
 import {
   faMagnifyingGlass,
   faList,
@@ -9,9 +10,36 @@ import "../Header/Header.css";
 import Filter from "../../Filter/Filter";
 import Survey from "../../Survey/Survey";
 
-const Header = ({ isInnerVisible, onSearchClick, onReset, onFilter }) => {
+const Header = ({
+  isInnerVisible,
+  onSearchClick,
+  onReset,
+  onFilter,
+  showModal,
+  onInner,
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeContent, setActiveContent] = useState("Filter");
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (isInnerVisible) {
+        onReset();
+      }
+    },
+
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+    trackTouch: true,
+    delta: 50,
+    swipeDuration: 500,
+  });
+
+  useEffect(() => {
+    if (!isInnerVisible) {
+      setIsMenuOpen(false);
+    }
+  }, [isInnerVisible]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -32,10 +60,11 @@ const Header = ({ isInnerVisible, onSearchClick, onReset, onFilter }) => {
     setActiveContent("Filter");
   };
 
-
-
   return (
-    <div className={`inner ${isInnerVisible ? "visible" : "hidden"}`}>
+    <div
+      {...handlers}
+      className={`inner ${isInnerVisible ? "visible" : "hidden"}`}
+    >
       <header className="header">
         <div className="logo-list" onClick={toggleMenu}>
           <FontAwesomeIcon icon={faList} />
@@ -73,10 +102,12 @@ const Header = ({ isInnerVisible, onSearchClick, onReset, onFilter }) => {
         </div>
       </header>
       <div className="content_list">
-        {activeContent === "Filter" && <Filter onFilter={onFilter} />}
+        {activeContent === "Filter" && (
+          <Filter onReset={onReset} onFilter={onFilter} />
+        )}
 
         {activeContent === "Survey" && (
-          <Survey onCloseSurvey={handleCloseSurvey} />
+          <Survey onCloseSurvey={handleCloseSurvey} showModal={showModal} />
         )}
       </div>
     </div>

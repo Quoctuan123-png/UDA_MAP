@@ -9,11 +9,11 @@ import { fetchTienNghi, fetchThongTinThem, fetchFind } from "../services/api"; /
 
 const cx = classNames.bind(styles);
 
-const Filter = ({ onFilter }) => {
+const Filter = ({ onFilter, onReset }) => {
   const [showMore, setShowMore] = useState(false);
   const [selectedArea, setSelectedArea] = useState("");
   const navigate = useNavigate();
-  const [lengthdata, setlenghtdata] = useState(null)
+  const [lengthdata, setlenghtdata] = useState(null);
   const [tienNghiList, setTienNghiList] = useState([]); //lưu tiennghi
   const [thongtinthemList, setThongTinThemList] = useState([]); //lưu tiennghi
   const [formData, setFormData] = useState({
@@ -90,15 +90,22 @@ const Filter = ({ onFilter }) => {
   // Hành động khi chọn trường radio
   const handleRadiusChange = (e) => {
     const value = e.target.value;
-    setSelectedArea(value); // Cập nhật state để hiển thị lựa chọn
-    // Trích xuất số km từ chuỗi và chuyển sang mét
-    const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
-    console.log(radius);
-    // Cập nhật formData với giá trị radius (đơn vị: mét)
-    setFormData((prev) => ({
-      ...prev,
-      radius: radius,
-    }));
+    if (selectedArea === value) {
+      // If clicking the same value, unselect it
+      setSelectedArea("");
+      setFormData((prev) => ({
+        ...prev,
+        radius: "",
+      }));
+    } else {
+      // If clicking a new value, select it
+      setSelectedArea(value);
+      const radius = parseInt(value.replace(/\D/g, ""), 10) * 1000;
+      setFormData((prev) => ({
+        ...prev,
+        radius: radius,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -115,10 +122,13 @@ const Filter = ({ onFilter }) => {
       //     headers: { "Content-Type": "application/json" },
       //   }
       // );
-      const infoResponse = await fetchFind(formData)
+      const infoResponse = await fetchFind(formData);
+
       console.log("Phản hồi từ API:", infoResponse.data);
-      setlenghtdata(infoResponse.data.length)
+      setlenghtdata(infoResponse.data.length);
+
       onFilter(infoResponse.data); // Gọi hàm onFilter với dữ liệu đã lọc
+      onReset();
     } catch (error) {
       if (error.response) {
         console.error(
@@ -139,6 +149,7 @@ const Filter = ({ onFilter }) => {
       <div className={cx("header")}>
         <p className={cx("heading_title")}>Tìm Kiếm</p>
       </div>
+
       <div className={cx("content")}>
         <div className={cx("list")}>
           <h3 className={cx("list_title")}>
@@ -148,8 +159,8 @@ const Filter = ({ onFilter }) => {
           </h3>
           <FontAwesomeIcon className={cx("down")} icon={faChevronDown} />
           <div className={cx("list_inner")}>
-            {["Dưới 1km", "Dưới 2km", "Dưới 3km"].map((item) => (
-              <div key={item} className={cx("inner_spacer")}>
+            {["Dưới 1km", "Dưới 2km", "Dưới 3km", "Không chọn"].map((item) => (
+              <label key={item} className={cx("inner_spacer")}>
                 <input
                   type="radio"
                   className={cx("inner_radio")}
@@ -159,7 +170,7 @@ const Filter = ({ onFilter }) => {
                   onChange={handleRadiusChange}
                 />
                 <p className={cx("inner_title")}>{item}</p>
-              </div>
+              </label>
             ))}
           </div>
         </div>
@@ -168,7 +179,6 @@ const Filter = ({ onFilter }) => {
           <h2 className={cx("title_desc")}>Mức giá (triệu/tháng)</h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
-              <span className={cx("dien-tich-label")}></span>
               <input
                 type="number"
                 name="giaMin"
@@ -180,7 +190,6 @@ const Filter = ({ onFilter }) => {
             </div>
 
             <div className={cx("dien-tich-item")}>
-              <span className={cx("dien-tich-label")}></span>
               <input
                 type="number"
                 name="giaMax"
@@ -197,7 +206,6 @@ const Filter = ({ onFilter }) => {
           <h2 className={cx("title_desc")}>Diện tích (m2)</h2>
           <div className={cx("dien-tich-container1")}>
             <div className={cx("dien-tich-item")}>
-              <span className={cx("dien-tich-label")}></span>
               <input
                 type="number"
                 name="kichThuocMin"
@@ -209,7 +217,6 @@ const Filter = ({ onFilter }) => {
             </div>
 
             <div className={cx("dien-tich-item")}>
-              <span className={cx("dien-tich-label")}></span>
               <input
                 type="number"
                 name="kichThuocMax"
@@ -240,36 +247,23 @@ const Filter = ({ onFilter }) => {
             </div>
           </div>
 
-          {/* <div className={cx("form_group")}>
-            <h3 className={cx("title_desc")}>Thông tin thêm</h3>
-            <div className={cx("option_item")}>
-              {thongtinthemList.map((item) => (
-                <div key={item.id} className={cx("item")}>
-                  <input
-                    type="checkbox"
-                    className={cx("option_checkbox")}
-                    value={item.id}
-                    onChange={handleCheckboxChange1}
-                  />
-                  <p className={cx("option_title")}>{item.thongTinThem}</p>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
           <div className={cx("seperate")}></div>
+
           {lengthdata !== null && lengthdata !== undefined && (
-            <div style={{ textAlign: "center", fontWeight: "bold", color: "red" }}>
+            <div
+              style={{ textAlign: "center", fontWeight: "bold", color: "red" }}
+            >
               Có {lengthdata} phòng phù hợp với bạn
             </div>
           )}
-          <button className={cx("search")} onClick={handleSubmit}>
-            Tìm ngay
-          </button>
         </div>
       </div>
+
+      <button className={cx("search")} onClick={handleSubmit}>
+        Tìm ngay
+      </button>
     </div>
   );
 };
-
+//
 export default Filter;
