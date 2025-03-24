@@ -7,7 +7,7 @@ const { calculateHaversineDistance } = require("./OpenStresstMap")
 const HinhAnhNhaTro = require("../models/HinhAnhNhaTro")
 const fs = require("fs");
 const path = require("path");
-const { NhaTro, TienNghi, TienNghiNhaTro, ThongTinThemNhaTro, ThongTinThem } = require("../models");
+const { NhaTro, TienNghi, TienNghiNhaTro, ThongTinThemNhaTro, ThongTinThem ,DanhGiaNhaTro , Users  } = require("../models");
 // tạo phòng trọ mớimới
 const createNhaTro = async (req, res) => {
     try {
@@ -304,4 +304,127 @@ const getAllThongTinThem = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
-module.exports = { getAllTienNghi, getAllThongTinThem, createNhaTro, getAllNhaTro, findNhaTro, findtienich, upfiles, getImage, getRoom };
+
+const danhGiaNhaTro = async (req, res) => {
+    try {
+        const { noiDung, soSao } = req.body;
+        const { maNhaTro } = req.params; // 📌 Lấy maNhaTro từ params
+        const nguoiDanhGia = req.body.id; // Lấy ID người dùng từ request (middleware xác thực)
+
+        // Kiểm tra nhà trọ có tồn tại không
+        const nhaTro = await NhaTro.findByPk(maNhaTro);
+        if (!nhaTro) {
+            return res.status(404).json({ message: "Nhà trọ không tồn tại" });
+        }
+
+        // Tìm đánh giá của người dùng cho nhà trọ này
+        let danhGia = await DanhGiaNhaTro.findOne({
+            where: { maNhaTro, nguoiDanhGia }
+        });
+
+        if (danhGia) {
+            // ✅ Cập nhật cả nội dung và số sao
+            danhGia.noiDung = noiDung;
+            danhGia.soSao = soSao;
+            await danhGia.save();
+            return res.status(200).json({ message: "Cập nhật đánh giá thành công", danhGia });
+        } else {
+            // Nếu chưa đánh giá -> Tạo mới
+            danhGia = await DanhGiaNhaTro.create({
+                maNhaTro,
+                nguoiDanhGia,
+                noiDung,
+                soSao
+            });
+            return res.status(201).json({ message: "Đánh giá thành công", danhGia });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getDanhGiaNhaTro = async (req, res) => {
+    try {
+        const { maNhaTro } = req.params;
+
+        // Kiểm tra nhà trọ có tồn tại không
+        const nhaTro = await NhaTro.findByPk(maNhaTro);
+        if (!nhaTro) {
+            return res.status(404).json({ message: "Nhà trọ không tồn tại" });
+        }
+
+        // Lấy tất cả đánh giá của nhà trọ
+        const danhGiaList = await DanhGiaNhaTro.findAll({
+            where: { maNhaTro },
+            include: {
+                model: Users,
+                attributes: ["id", "fullname", "avatar"] // Lấy thông tin user đánh giá
+            },
+            order: [["createdAt", "DESC"]]
+        });
+
+        console.log("🔥 Danh sách đánh giá:", JSON.stringify(danhGiaList, null, 2));
+
+        // Tính trung bình số sao
+        const tongSoSao = danhGiaList.reduce((sum, dg) => sum + dg.soSao, 0);
+        const trungBinhSao = danhGiaList.length > 0 ? (tongSoSao / danhGiaList.length).toFixed(1) : 0;
+
+        return res.status(200).json({
+            message: "Lấy danh sách đánh giá thành công",
+            trungBinhSao,
+            danhGiaList
+        });
+
+    } catch (error) {
+        console.error("🔥 Lỗi tại server:", error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+const duyet = async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const nhaTro = await NhaTro.findByPk(id);
+  
+      if (!nhaTro) {
+        return res.status(404).json({ message: "Nhà trọ không tồn tại" });
+      }
+  
+      // Lấy trạng thái hiện tại
+      const currentTrangThai = nhaTro.trangThai;
+  
+      // Toggle trạng thái (0 -> 1 hoặc 1 -> 0)
+      nhaTro.trangThai = currentTrangThai === 0 ? 1 : 0;
+  
+      await nhaTro.save();
+  
+      return res.status(200).json({
+        message: `Trạng thái đã được thay đổi thành ${nhaTro.trangThai === 1 ? 'Đã Duyệt' : 'Chưa Duyệt'}`,
+        nhaTro,
+      });
+    } catch (error) {
+      console.error("Lỗi khi thay đổi trạng thái:", error);
+      return res.status(500).json({ message: "Lỗi khi thay đổi trạng thái nhà trọ" });
+    }
+  };
+  const updateNhaTro = async (req, res) => {
+    try {
+        const { id } = req.params; // ✅ Đúng với route
+
+        // Tìm nhà trọ theo id
+        const nhaTro = await NhaTro.findByPk(id);
+        if (!nhaTro) {
+            return res.status(404).json({ message: "Không tìm thấy nhà trọ" });
+        }
+
+        // Cập nhật thông tin nhà trọ
+        await nhaTro.update(req.body);
+
+        res.status(200).json({ message: "Cập nhật nhà trọ thành công" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Lỗi cập nhật nhà trọ" });
+    }
+};
+module.exports = { getAllTienNghi, getAllThongTinThem, createNhaTro, getAllNhaTro, findNhaTro, findtienich, upfiles, getImage, getRoom, danhGiaNhaTro,getDanhGiaNhaTro,duyet,updateNhaTro };

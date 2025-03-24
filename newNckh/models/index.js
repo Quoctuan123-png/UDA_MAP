@@ -5,6 +5,8 @@ const TienNghi = require("./TienNghi");
 const TienNghiNhaTro = require("./TienNghiNhaTro");
 const ThongTinThem = require("./ThongTinThem");
 const ThongTinThemNhaTro = require("./ThongTinThemNhaTro");
+const DanhGiaNhaTro = require("./DanhGiaNhaTro");
+const Users = require("./Users"); // Import User model nếu có
 
 // 🔗 Quan hệ giữa NhaTro & TienNghi (Nhiều - Nhiều)
 NhaTro.belongsToMany(TienNghi, {
@@ -26,6 +28,14 @@ ThongTinThem.belongsToMany(NhaTro, {
     foreignKey: "idThongTinThem"
 });
 
+// 🔗 Quan hệ giữa DanhGiaNhaTro & NhaTro (1 - Nhiều)
+NhaTro.hasMany(DanhGiaNhaTro, { foreignKey: "maNhaTro" });
+DanhGiaNhaTro.belongsTo(NhaTro, { foreignKey: "maNhaTro" });
+
+// 🔗 Quan hệ giữa DanhGiaNhaTro & User (1 - Nhiều)
+Users.hasMany(DanhGiaNhaTro, { foreignKey: "nguoiDanhGia" });
+DanhGiaNhaTro.belongsTo(Users, { foreignKey: "nguoiDanhGia" });
+
 // 🚀 Xuất các model để sử dụng
 module.exports = {
     sequelize,
@@ -33,5 +43,7 @@ module.exports = {
     TienNghi,
     TienNghiNhaTro,
     ThongTinThem,
-    ThongTinThemNhaTro
+    ThongTinThemNhaTro,
+    DanhGiaNhaTro,
+    Users
 };
