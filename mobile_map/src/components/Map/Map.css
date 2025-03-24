@@ -1,8 +1,8 @@
 .map {
     width: 100%;
-    height: auto;
-}
-
+    height: 100vh; /* Trừ chiều cao của header */
+    overflow: hidden;  /* Đảm bảo không có thanh cuộn trên map */
+  }
 @media screen and (max-width: 480px) {
     .map {
         width: 100%;

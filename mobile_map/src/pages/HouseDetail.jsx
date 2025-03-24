@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import '../style/HouseDetail.css';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import L from "leaflet";
-import { Swiper, SwiperSlide } from 'swiper/react';
+import 'leaflet/dist/leaflet.css';
+import React, { useEffect, useState } from "react";
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { useNavigate, useParams } from "react-router-dom";
 import 'swiper/css';
 import 'swiper/css/navigation';
-import { Navigation } from 'swiper/modules';
-import { getHouseDetail, fetchImage, fetchTienIch, fetchTienNghi } from "../services/api"; // Import hàm fetchTienIch
+import { fetchDanhGia, fetchTienNghi, getHouseDetail } from "../services/api"; // Import hàm fetchTienIch
+import '../style/HouseDetail.css';
 
 // Tạo icon FontAwesome cho marker
 const houseIcon = L.divIcon({
@@ -68,6 +66,7 @@ const HouseDetail = () => {
         const fetchHouse = async () => {
             try {
                 const data1 = await getHouseDetail(id);
+                const data2 = await fetchDanhGia(id)
                 setHouse(data1.data);
                 console.log("🏠 Dữ liệu nhà trọ:", data1.data.TienNghis);
 

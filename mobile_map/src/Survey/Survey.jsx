@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from "react";
-import classNames from "classnames/bind";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCamera,
-  faChevronDown,
-  faTimes,
+  faTimes
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import classNames from "classnames/bind";
 import L from "leaflet";
-import styles from "./Survey.module.scss";
+import "leaflet/dist/leaflet.css";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
-  TileLayer,
   Marker,
-  useMapEvents,
-  Popup,
+  TileLayer,
+  useMapEvents
 } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router-dom";
-import { fetchTienNghi, fetchThongTinThem } from "../services/api"; // Import hàm fetchTienIch
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchThongTinThem, fetchTienNghi } from "../services/api"; // Import hàm fetchTienIch
+import styles from "./Survey.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -562,7 +559,7 @@ const Survey = ({ onCloseSurvey, showModal }) => {
             center={[16.032, 108.2212]}
             zoom={15}
             scrollWheelZoom={true}
-            style={{ width: "100%", height: "300px" }}
+            style={{ width: "100%", height: "290px" }}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <LocationMarker />
