@@ -6,7 +6,7 @@ const morgan = require('morgan')
 const sequelize = require("./config/db")
 const app = express()
 
-
+const TienIchRouter = require('./routes/TienIchRouter')
 
 const NhaTroRoutes = require('./routes/NhaTroRoutes'); // Import routes
 
@@ -18,6 +18,7 @@ app.use(morgan("common"))
 app.use(cors())
 
 app.use('/api', NhaTroRoutes); // Cập nhật base route cho các API của NhaTro
+app.use('/api', TienIchRouter); // Cập nhật base route cho các API của NhaTro
 
 app.use('/uploads', express.static('uploads'));
 

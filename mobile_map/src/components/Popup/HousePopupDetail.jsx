@@ -3,8 +3,16 @@ import React, { useEffect, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./HousePopupDetail.css";
-
-import { fetchDanhGia, fetchGuiDanhGia, fetchImage, fetchThongTinThem, fetchTienNghi, getHouseDetail } from "../../services/api"; // Import hàm fetchTienIch
+import {
+  fetchDanhGia,
+  fetchGuiDanhGia,
+  fetchImage,
+  fetchThongTinThem,
+  fetchTienNghi,
+  getHouseDetail,
+  fetchTienIchXungQuanh,
+  fetchTienIch
+} from "../../services/api"; // Import hàm fetchTienIch
 
 const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   const [activeTab, setActiveTab] = useState("info");
@@ -14,35 +22,19 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   const [danhGiaList, setDanhGiaList] = useState([])
   const [trungBinhSao, settrungBinhSao] = useState([])
 
+  const [tienIch, setTienIch] = useState([]);// Lấy khoảng cách từ trọ tới tiện ích
   const [thongTinThemList, setThongTinThem] = useState([]); // State để lưu trữ thông tin thêm từ nhà trọ
   const [tienNghiList, setTienNghiList] = useState([]);// Lấy danh sách nội thất từ nhà trọ
   const [thongTinThemListAll, setThongTinThemAll] = useState([]); // State để lưu trữ thông tin thêm từ API
   const [tienNghiListAll, setTienNghiListAll] = useState([]);// Lấy danh sách nội thất từ API
-
+  const [formData, setFormData] = useState()
 
   console.log("🏠 Dữ liệu nhà trọ:", house);
   const id = house.id;
-
-  // Lấy danh sách thông tin thêm từ api
-  useEffect(() => {
-    const fetchThongTinThemList = async () => {
-      try {
-        const response = await fetchThongTinThem();
-
-        console.log("✅ Dữ liệu tất cả Thông tin thêm:", response);
-        setThongTinThemAll(response);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách thông tin thêm:", error);
-      }
-    };
-
-    fetchThongTinThemList();
-  }, []);
-
-
   const [noiDung, setNoiDung] = useState("");
   const [soSao, setSoSao] = useState(5);
   const [error, setError] = useState(null);
+
 
   const handleDanhGia = async () => {
     if (!noiDung.trim()) {
@@ -74,7 +66,25 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   };
 
 
-  // Lấy danh sách tiện ích xung quanh từ API
+  // Lấy danh sách thông tin thêm từ api
+  useEffect(() => {
+    const fetchThongTinThemList = async () => {
+      try {
+        const response = await fetchThongTinThem();
+
+        console.log("✅ Dữ liệu tất cả Thông tin thêm:", response);
+        setThongTinThemAll(response);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách thông tin thêm:", error);
+      }
+    };
+
+    fetchThongTinThemList();
+  }, []);
+
+
+
+  // Lấy ds tiện nghi từ API
   useEffect(() => {
     const fetchTienNghiList = async () => {
       try {
@@ -90,36 +100,26 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   }, []);
 
 
+  // Lấy chức năng tính khoảng cách tiện ích xung quanh từ API
+  useEffect(() => {
+    const fetchTienIch = async () => {
+      if (house?.lat && house?.lon) {
+        const toado = {
+          lat: house.lat,
+          lon: house.lon
+        };
+        const res = await fetchTienIchXungQuanh(toado);
+        setTienIch(res || []);
+      }
+    };
+    fetchTienIch();
+  }, [house?.lat, house?.lon]);
 
-  // // Xử lý lấy dữ liệu hình ảnh
-  // useEffect(() => {
-  //   const fetchHouseImg = async () => {
-  //     try {
-  //       const imgUrl = await fetchImage(id);
-  //       console.log("Ảnh tải về:", imgUrl); // Kiểm tra dữ liệu ảnh
-  //       setImg(imgUrl);
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy ảnh:", error);
-  //     }
-  //   };
-  //   fetchHouseImg();
-  // }, [id]);
 
-  // //lấy ảnh v2
-  // useEffect(() => {
-  //   const fetchHouseImg = async () => {
-  //     try {
-  //       const res = await fetchImage(id);
-  //       console.log("Ảnh tải về:", res.images); // Log kiểm tra
-  //       setImages(res.images || []);
-  //     } catch (error) {
-  //       console.error("Lỗi khi lấy ảnh:", error);
-  //     }
-  //   };
-  //   fetchHouseImg();
-  // }, [id]);
 
-  //lấy ảnh v3
+
+
+
   useEffect(() => {
     const loadImages = async () => {
       if (activeTab === "image" && id) {
@@ -328,9 +328,32 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
             </table>
 
 
-            <p style={{ color: "red" }}><b>Lưu ý:</b></p>
-            <p>{house.ghiChu.toLocaleString()}</p>
+            {/* <div className="house-amenities-table"> */}
+            <p><b>Tiện ích xung quanh:</b></p>
+            <table className="custom-table ">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên tiện ích</th>
+                  <th>Khoảng cách</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(tienIch) && tienIch.map((item, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.tenTienIch}</td>
+                    <td>{Math.round(item.distance)} m</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {/* </div> */}
 
+
+
+            <p style={{ color: "red" }}><b>Ghi chú:</b></p>
+            <p>{house.ghiChu ? house.ghiChu.toLocaleString() : "Không có lưu ý"}</p>
           </div>
         </div>
       )}
@@ -358,84 +381,84 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
 
 
 
-{activeTab === "danhgia" && (
-  <>
-    {/* 📌 Tổng đánh giá & trung bình số sao */}
-    <div className="mb-3">
-      <h3 className="h5">
-        📢 Đánh Giá: <span className="text-warning">{'⭐'.repeat(Math.round(trungBinhSao))}</span>
-        <br />
-        <small className="text-muted">({danhGiaList.length} người đánh giá)</small>
-      </h3>
-    </div>
-
-    {/* 📌 Danh sách đánh giá */}
-    <div className="mb-4">
-      {danhGiaList.map((danhGia) => (
-        <div key={danhGia.id} className="border rounded p-3 mb-3">
-          {/* Avatar + Tên */}
-          <div className="d-flex align-items-center mb-2">
-            <img
-              src={
-                // danhGia.User?.avatar ||
-                "http://localhost:8000/uploads/man.png"
-              }
-              alt="Avatar"
-              width={30}
-              height={30}
-              className="rounded-circle me-2"
-              style={{ objectFit: "cover" }}
-            />
-            <strong>{danhGia.User?.fullname || "Ẩn danh"}</strong>
+      {activeTab === "danhgia" && (
+        <>
+          {/* 📌 Tổng đánh giá & trung bình số sao */}
+          <div className="mb-3">
+            <h3 className="h5">
+              📢 Đánh Giá: <span className="text-warning">{'⭐'.repeat(Math.round(trungBinhSao))}</span>
+              <br />
+              <small className="text-muted">({danhGiaList.length} người đánh giá)</small>
+            </h3>
           </div>
 
-          {/* Số sao */}
-          <p className="mb-1 text-warning">👍 {"★".repeat(danhGia.soSao)}</p>
+          {/* 📌 Danh sách đánh giá */}
+          <div className="mb-4">
+            {danhGiaList.map((danhGia) => (
+              <div key={danhGia.id} className="border rounded p-3 mb-3">
+                {/* Avatar + Tên */}
+                <div className="d-flex align-items-center mb-2">
+                  <img
+                    src={
+                      // danhGia.User?.avatar ||
+                      "http://localhost:8000/uploads/man.png"
+                    }
+                    alt="Avatar"
+                    width={30}
+                    height={30}
+                    className="rounded-circle me-2"
+                    style={{ objectFit: "cover" }}
+                  />
+                  <strong>{danhGia.User?.fullname || "Ẩn danh"}</strong>
+                </div>
 
-          {/* Nội dung đánh giá */}
-          <p className="mb-0">📢 {danhGia.noiDung}</p>
-        </div>
-      ))}
-    </div>
+                {/* Số sao */}
+                <p className="mb-1 text-warning">👍 {"★".repeat(danhGia.soSao)}</p>
 
-    {/* 📌 Form đánh giá */}
-    <div className="border rounded p-4">
-      <h4 className="h6 mb-3">Viết đánh giá của bạn</h4>
+                {/* Nội dung đánh giá */}
+                <p className="mb-0">📢 {danhGia.noiDung}</p>
+              </div>
+            ))}
+          </div>
 
-      {/* Nhập nội dung đánh giá */}
-      <div className="mb-3">
-        <textarea
-          className="form-control"
-          placeholder="Nhập nội dung đánh giá..."
-          value={noiDung}
-          onChange={(e) => setNoiDung(e.target.value)}
-          rows={4}
-        />
-      </div>
+          {/* 📌 Form đánh giá */}
+          <div className="border rounded p-4">
+            <h4 className="h6 mb-3">Viết đánh giá của bạn</h4>
 
-      {/* Chọn số sao */}
-      <div className="mb-3">
-        <label className="form-label me-2">Chọn số sao:</label>
-        {[1, 2, 3, 4, 5].map((sao) => (
-          <button
-            key={sao}
-            type="button"
-            className={`btn btn-sm ${soSao >= sao ? "btn-warning" : "btn-outline-secondary"} me-1`}
-            onClick={() => setSoSao(sao)}
-            style={{ width: "30px", height: "30px", fontSize: "14px", padding: "0" }}
-          >
-            {soSao >= sao ? "⭐" : "★"}
-          </button>
-        ))}
-      </div>
+            {/* Nhập nội dung đánh giá */}
+            <div className="mb-3">
+              <textarea
+                className="form-control"
+                placeholder="Nhập nội dung đánh giá..."
+                value={noiDung}
+                onChange={(e) => setNoiDung(e.target.value)}
+                rows={4}
+              />
+            </div>
 
-      {/* Nút gửi đánh giá */}
-      <button className="btn btn-primary" onClick={handleDanhGia}>
-        Gửi đánh giá
-      </button>
-    </div>
-  </>
-)}
+            {/* Chọn số sao */}
+            <div className="mb-3">
+              <label className="form-label me-2">Chọn số sao:</label>
+              {[1, 2, 3, 4, 5].map((sao) => (
+                <button
+                  key={sao}
+                  type="button"
+                  className={`btn btn-sm ${soSao >= sao ? "btn-warning" : "btn-outline-secondary"} me-1`}
+                  onClick={() => setSoSao(sao)}
+                  style={{ width: "30px", height: "30px", fontSize: "14px", padding: "0" }}
+                >
+                  {soSao >= sao ? "⭐" : "★"}
+                </button>
+              ))}
+            </div>
+
+            {/* Nút gửi đánh giá */}
+            <button className="btn btn-primary" onClick={handleDanhGia}>
+              Gửi đánh giá
+            </button>
+          </div>
+        </>
+      )}
 
 
     </div>

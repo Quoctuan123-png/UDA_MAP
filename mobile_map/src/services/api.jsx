@@ -29,7 +29,7 @@ export const getHouseDetail = async (id) => {
     });
     console.log(room);
     return room;
-  } catch (error) {}
+  } catch (error) { }
 };
 
 //call api lấy hình ảnh
@@ -143,6 +143,46 @@ export const fetchThongTinThem = async (Id) => {
   }
 };
 
+
+// Hàm gọi thông tin tiện ích
+export const fetchTienIch = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/tien-ich`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    const data = await response.json();
+    console.log(data)
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+// Hàm gọi thông tin tiện ích
+export const fetchTienIchXungQuanh = async (toado) => {
+  try {
+    const res = await axios.post(
+      `${API_URL}/api/tien-ich-xung-quanh`,
+      toado, // Body JSON
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", res)
+    return res.data;
+  } catch (err) {
+    console.error("Lỗi gọi API tiện ích xung quanh:", err);
+    return [];
+  }
+};
+
+
+
 export const fetchGuiDanhGia = async (id, danhGiaData) => {
   try {
     const response = await axios.post(`${API_URL}/api/danh-gia/${id}`, danhGiaData, {
@@ -168,9 +208,9 @@ export const fetchDanhGia = async (id) => {
     });
     console.log(room);
     return room;
-  } catch (error) {}
+  } catch (error) { }
 };
-export const handleDuyetAPI  = async (id) => {
+export const handleDuyetAPI = async (id) => {
   try {
     // Gửi API để thay đổi trạng thái
     const response = await axios.post(`${API_URL}/api/duyet/${id}`);
@@ -178,24 +218,25 @@ export const handleDuyetAPI  = async (id) => {
       // Nếu thành công, bạn có thể làm mới lại dữ liệu hoặc cập nhật lại state
       console.log("Trạng thái đã được cập nhật!");
       // Giả sử bạn có một hàm để reload lại dữ liệu
-  return response
+      return response
     }
   } catch (error) {
     console.error("Lỗi khi duyệt hoặc hủy duyệt:", error);
-  }}
-  export const customroom = async (id, formData) => {
-    try {
-      const response = await axios.put(`${API_URL}/api/update-nha-tro/${id}`, formData);
-  
-      if (response.status === 200) {
-        console.log("Cập nhật thành công:", response.data);
-        return response.data; // Trả về dữ liệu đã cập nhật
-      } else {
-        console.warn("Cập nhật thất bại:", response);
-        return null; // Trả về null nếu thất bại
-      }
-    } catch (error) {
-      console.error("Lỗi khi cập nhật nhà trọ:", error);
-      throw error; // Ném lỗi để có thể bắt bên ngoài
+  }
+}
+export const customroom = async (id, formData) => {
+  try {
+    const response = await axios.put(`${API_URL}/api/update-nha-tro/${id}`, formData);
+
+    if (response.status === 200) {
+      console.log("Cập nhật thành công:", response.data);
+      return response.data; // Trả về dữ liệu đã cập nhật
+    } else {
+      console.warn("Cập nhật thất bại:", response);
+      return null; // Trả về null nếu thất bại
     }
-  };
+  } catch (error) {
+    console.error("Lỗi khi cập nhật nhà trọ:", error);
+    throw error; // Ném lỗi để có thể bắt bên ngoài
+  }
+};
