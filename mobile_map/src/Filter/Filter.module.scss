@@ -1,13 +1,13 @@
 // @media screen and (max-width: 480px) {
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 0 10px;
-  max-height: 670px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 10px;
+    height: calc(100vh - 80px); /* Trừ đi chiều cao của header */
+    overflow-y: auto; /* Tạo thanh cuộn dọc riêng cho filter */
+    overflow-x: hidden; /* Ngăn thanh cuộn ngang */
+  }
 
 .header {
   display: flex;
@@ -15,14 +15,14 @@
   align-items: center;
   padding: 0 20px;
   z-index: 9999;
-  height: 47px;
+  height: 30px;
 }
 
 .heading_title {
   font-size: 2rem;
   text-transform: uppercase;
   font-weight: 600;
-  padding-top: 30px;
+  padding-top: 33px;
 }
 
 .clear {
@@ -31,7 +31,7 @@
 }
 
 .list {
-  height: 50px;
+  height: 40px;
   display: flex;
   align-items: center;
   background: transparent;
@@ -198,10 +198,10 @@
 
 .option_item {
   display: grid;
-  gap: 14px 1px;
+  gap: 0px 0px;
   grid-template-columns: repeat(2, 1fr);
   place-items: flex-start;
-  margin: 15px 0 15px 0;
+  margin: 9px 0 -13px 0;
 }
 
 .option_item p {
@@ -242,7 +242,7 @@
 .dien-tich-item {
   margin-bottom: 10px;
   width: 48%;
-  height: 50px;
+  height: 40px;
   display: flex;
 }
 
@@ -270,7 +270,7 @@
 
 .title_desc {
   font-size: 1.5rem;
-  margin-top: 15px;
+  // margin-top: 15px;
   font-weight: 600;
   margin-bottom: 9px;
 }
@@ -280,6 +280,6 @@
     max-height: 100%;
   }
   .list {
-    height: 60px;
+    height: 40px;
   }
 }

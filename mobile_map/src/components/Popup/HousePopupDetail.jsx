@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./HousePopupDetail.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { getHouseDetail, fetchImage, fetchTienIch, fetchTienNghi, fetchThongTinThem } from "../../services/api"; // Import hàm fetchTienIch
+import { fetchDanhGia, fetchGuiDanhGia, fetchImage, fetchThongTinThem, fetchTienNghi, getHouseDetail } from "../../services/api"; // Import hàm fetchTienIch
 
 const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   const [activeTab, setActiveTab] = useState("info");
 
   const [houseState, sethouseState] = useState(null);
   const [images, setImages] = useState([]);
+  const [danhGiaList,setDanhGiaList] = useState([])
+  const [trungBinhSao,settrungBinhSao] = useState([])
+
   const [thongTinThemList, setThongTinThem] = useState([]); // State để lưu trữ thông tin thêm từ nhà trọ
   const [tienNghiList, setTienNghiList] = useState([]);// Lấy danh sách nội thất từ nhà trọ
   const [thongTinThemListAll, setThongTinThemAll] = useState([]); // State để lưu trữ thông tin thêm từ API
@@ -38,8 +40,40 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
   }, []);
 
 
+  const [noiDung, setNoiDung] = useState("");
+  const [soSao, setSoSao] = useState(5);
+  const [error, setError] = useState(null);
 
-
+  const handleDanhGia = async () => {
+    if (!noiDung.trim()) {
+      setError("Vui lòng nhập nội dung đánh giá!");
+      return;
+    }
+  
+    try {
+      const danhGiaData = { noiDung, soSao, id: 4 };
+      const response = await fetchGuiDanhGia(id, danhGiaData);
+      
+      if (response) {
+        alert(response.message);
+        setNoiDung("");
+        setSoSao(5);
+        setError(null);
+  
+        // 🔄 Load lại danh sách đánh giá ngay sau khi gửi đánh giá thành công
+        const updatedDanhGia = await fetchDanhGia(id);
+        setDanhGiaList(updatedDanhGia.data.danhGiaList);
+        settrungBinhSao(updatedDanhGia.data.trungBinhSao);
+      } else {
+        setError("Lỗi xảy ra!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gửi đánh giá:", error);
+      setError("Lỗi kết nối đến server!");
+    }
+  };
+  
+  
   // Lấy danh sách tiện ích xung quanh từ API
   useEffect(() => {
     const fetchTienNghiList = async () => {
@@ -106,10 +140,13 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
     const fetchHouse = async () => {
       try {
         const data1 = await getHouseDetail(id);
-        console.log("khanhhhhhhhhhhhh", data1.data)
-        console.log("🏠 Dữ liệu nhà trọ:", data1.data);
-
-        setThongTinThem([...data1.data.ThongTinThems]); // Cập nhật state thông tin thêm của nhà trọ
+        console.log(id)
+       const data2 = await fetchDanhGia(id)
+       console.log(data2)
+        setThongTinThem([...data1.data.ThongTinThems]);
+        setDanhGiaList([...data2.data.danhGiaList]);
+        settrungBinhSao(data2.data.trungBinhSao ) // Cập nhật state thông tin thêm của nhà trọ
+        // Cập nhật state thông tin thêm của nhà trọ
         console.log("🏠 Dữ liệu thông tin thêm:", data1.data.ThongTinThems);
 
 
@@ -165,6 +202,7 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
         <button onClick={() => handleTabChange("info")} className={`tab-btn ${activeTab === "info" ? "active" : ""}`}>Giới thiệu</button>
         <button onClick={() => handleTabChange("amenities")} className={`tab-btn ${activeTab === "amenities" ? "active" : ""}`}>Chi tiết</button>
         <button onClick={() => handleTabChange("image")} className={`tab-btn ${activeTab === "image" ? "active" : ""}`}>Hình ảnh</button>
+        <button onClick={() => handleTabChange("danhgia")} className={`tab-btn ${activeTab === "danhgia" ? "active" : ""}`}>Đánh giá</button>
       </div>
 
       {/* Tabs content */}
@@ -316,6 +354,88 @@ const HousePopupDetail = ({ house, onCoordinatesr, onShowRouting }) => {
           )}
         </>
       )}
+     {activeTab === "danhgia" && (
+  <>
+    {/* 📌 Tổng đánh giá & trung bình số sao */}
+    <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+      <h3 className="text-lg font-semibold">
+      📢 Đánh Giá: <span >{"⭐".repeat(Math.round(trungBinhSao))}</span>
+      <br></br><small> ({danhGiaList.length} người đánh giá)</small>
+      </h3>
+    </div>
+
+    {/* 📌 Danh sách đánh giá */}
+    <div className="space-y-4">
+    {danhGiaList.map((danhGia) => (
+ <div key={danhGia.id} className="p-4 border rounded-lg">
+ {/* Avatar + Tên (cùng hàng) */}
+ <div className="flex items-center space-x-3">
+ <img
+  src={
+    // danhGia.User?.avatar ||
+    "http://localhost:8000/uploads/man.png"
+  }
+  alt="Avatar"
+  width={20} 
+  height={20}
+  style={{ objectFit: "cover", borderRadius: "50%" }} // Tuỳ chỉnh hiển thị
+/>
+   <span className="font-semibold">  {danhGia.User?.fullname || "Ẩn danh"}</span>
+ </div>
+
+ {/* Số sao */}
+ <p className="text-yellow-500 mt-1"> 👍 {"★".repeat(danhGia.soSao)}</p>
+
+ {/* Nội dung đánh giá */}
+ <p className="mt-2"> 📢 {danhGia.noiDung}</p>
+</div>
+
+))}
+
+    </div>
+    📌 Form đánh giá
+    
+    <div className="mt-6 p-6 bg-white shadow-lg rounded-lg">
+  <h4 className="text-xl font-semibold mb-3">Viết đánh giá của bạn</h4>
+
+  {/* Nhập nội dung đánh giá */}
+  <textarea
+    className="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 outline-none"
+    placeholder="Nhập nội dung đánh giá..."
+    value={noiDung}
+    onChange={(e) => setNoiDung(e.target.value)}
+    rows={4}
+  ></textarea>
+
+  {/* Chọn số sao */}
+  <div className="flex items-center space-x-2 mt-4">
+  <div className="flex">
+  <span className="font-medium">Chọn số sao:</span>
+    {[1, 2, 3, 4, 5].map((sao) => (
+      <button
+        key={sao}
+        className="text-3xl transition-colors"
+        onClick={() => setSoSao(sao)}
+        style={{ width: "20px", height: "20px", fontSize: "11px" }} // Giữ kích thước sao đồng nhất
+      >
+        {soSao >= sao ? "⭐" : "★"}
+      </button>
+    ))}
+  </div>
+</div>
+
+  {/* Nút gửi đánh giá */}
+  <button
+  className="mt-6 w-full py-4 text-lg bg-green-600 text-white font-bold
+             rounded-xl border-2 border-green-800 shadow-md
+             hover:bg-green-700 hover:shadow-lg transition-all duration-300"
+  onClick={handleDanhGia}
+>
+  Gửi đánh giá
+</button>
+</div>
+  </>
+)}
 
     </div>
   );

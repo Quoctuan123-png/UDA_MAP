@@ -1,7 +1,7 @@
 .wrapper {
-  max-height: 670px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  height: calc(100vh - 80px); /* 100vh trừ đi chiều cao của .header */
+  overflow-y: auto; /* Cho phép cuộn khi nội dung dài */
+  overflow-x: hidden; /* Ẩn cuộn ngang nếu có */
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -64,14 +64,15 @@
   border: 1px solid #ccc;
   margin-top: 12px;
   border-radius: 8px;
+  height: 40px;
 }
 
 .option_item {
   display: grid;
-  gap: 1px 1px;
+  gap: 0px 1px;
   grid-template-columns: repeat(2, 1fr);
   place-items: flex-start;
-  margin-top: 15px;
+  margin-top: -10px;
 }
 
 .option_item p {
@@ -208,7 +209,7 @@
 
 .dien-tich-item {
   width: 48%;
-  height: 50px;
+  height: 40px;
   position: relative;
   display: flex;
 }
@@ -226,7 +227,7 @@
   font-size: 15px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  height: 42px;
+  height: 40px;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
@@ -245,12 +246,12 @@
 
 .form_group {
   position: relative;
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .form_input {
   width: 100%;
-  padding: 4.5px 10px;
+  padding: 0.5px 10px;
   font-size: 1.7rem;
   border: none;
   border: 1px solid #ccc;
@@ -286,7 +287,7 @@
 .title_map {
   font-size: 1.6rem;
   margin-bottom: 15px;
-  margin-top: 18px;
+  margin-top: 10px;
   font-weight: 600;
 }
 
@@ -308,7 +309,7 @@
 
 .file-input-text {
   display: flex;
-  padding: 6px 10px;
+  padding: 1px 10px;
   font-size: 1.7rem;
   border: 1px solid #ccc;
   align-items: center;
@@ -384,7 +385,7 @@
   }
 
   .form_group {
-    margin: 30px 0;
+    margin: 0px 0;
   }
 
   .form_group p {
@@ -409,10 +410,10 @@
 
   .option_item {
     display: grid;
-    gap: 14px 1px;
+    gap: 4px 1px;
     grid-template-columns: repeat(2, 1fr);
     place-items: flex-start;
-    margin-top: 15px;
+    margin-top: -5px;
   }
 
   .option_item p {
@@ -508,18 +509,19 @@
     // background-color: #f9f9f9;
     display: flex;
     flex-direction: column;
-    margin-bottom: 30px;
+    // margin-bottom: 30px;
   }
 
   .dien-tich-container1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom:-15px
   }
 
   .dien-tich-container h2 {
     font-size: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     color: #333;
   }
 

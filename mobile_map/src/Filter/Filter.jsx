@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import classNames from "classnames/bind";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
-import styles from "./Filter.module.scss";
-import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
+import classNames from "classnames/bind";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchTienNghi, fetchThongTinThem, fetchFind } from "../services/api"; // Import hàm fetchTienIch
+import { fetchFind, fetchThongTinThem, fetchTienNghi } from "../services/api"; // Import hàm fetchTienIch
+import styles from "./Filter.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -243,9 +242,12 @@ const Filter = ({ onFilter, onReset }) => {
                   />
                   <p className={cx("option_title")}>{item.tenTienNghi}</p>
                 </div>
+                
               ))}
+              
             </div>
           </div>
+          
 
           <div className={cx("seperate")}></div>
 

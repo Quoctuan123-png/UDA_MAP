@@ -142,3 +142,60 @@ export const fetchThongTinThem = async (Id) => {
     console.log(error);
   }
 };
+
+export const fetchGuiDanhGia = async (id, danhGiaData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/danh-gia/${id}`, danhGiaData, {
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
+    return response.data; // Trả về dữ liệu phản hồi từ server
+  } catch (error) {
+    console.error("Lỗi khi gửi đánh giá:", error);
+    throw error; // Ném lỗi để xử lý phía component
+  }
+};
+
+export const fetchDanhGia = async (id) => {
+  try {
+    const room = await axios.get(`${API_URL}/api/danh-gia/${id}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+    console.log(room);
+    return room;
+  } catch (error) {}
+};
+export const handleDuyetAPI  = async (id) => {
+  try {
+    // Gửi API để thay đổi trạng thái
+    const response = await axios.post(`${API_URL}/api/duyet/${id}`);
+    if (response.status === 200) {
+      // Nếu thành công, bạn có thể làm mới lại dữ liệu hoặc cập nhật lại state
+      console.log("Trạng thái đã được cập nhật!");
+      // Giả sử bạn có một hàm để reload lại dữ liệu
+  return response
+    }
+  } catch (error) {
+    console.error("Lỗi khi duyệt hoặc hủy duyệt:", error);
+  }}
+  export const customroom = async (id, formData) => {
+    try {
+      const response = await axios.put(`${API_URL}/api/update-nha-tro/${id}`, formData);
+  
+      if (response.status === 200) {
+        console.log("Cập nhật thành công:", response.data);
+        return response.data; // Trả về dữ liệu đã cập nhật
+      } else {
+        console.warn("Cập nhật thất bại:", response);
+        return null; // Trả về null nếu thất bại
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật nhà trọ:", error);
+      throw error; // Ném lỗi để có thể bắt bên ngoài
+    }
+  };
